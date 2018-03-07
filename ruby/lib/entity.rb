@@ -21,6 +21,21 @@ class Entity
     id.hash
   end
 
+  def self.find_by_attributes(&entity_lookup)
+    events = EventStore.instance.find_all do |event|
+      begin
+        entity_lookup.call(event)
+      rescue NoMethodError
+        false
+      end
+    end.sort_by(&:timestamp)
+    return nil if events.empty?
+
+    projection = new
+    events.each { |e| e.apply_to(projection) }
+    projection
+  end
+
   def self.find_by_id(id, &event_id_lookup)
     events = EventStore.instance.find_all do |e|
       begin

@@ -7,8 +7,11 @@ class Book < Entity
   attr_reader :name, :author
 
   def self.create(name:, author:)
-    book = Book.new(name: name, author: author)
-    BookCreatedEvent.raise book
+    book = find_by_attributes { |event| name == event.book.name && author == event.book.author }
+    unless book
+      book = Book.new(name: name, author: author)
+      BookCreatedEvent.raise book
+    end
     book
   end
 
