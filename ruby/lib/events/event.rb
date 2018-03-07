@@ -7,7 +7,10 @@ class Event < Entity
     super
   end
 
-  def create_event?
-    type == 'create'
+  def update(projection, transform)
+    raise NotFoundError unless transform.key? :@timestamp
+    transform.each do |key, value|
+      projection.instance_variable_set(key, value)
+    end
   end
 end

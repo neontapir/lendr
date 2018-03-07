@@ -1,7 +1,7 @@
-require_relative '../entity.rb'
+require_relative 'event.rb'
 require_relative 'event_store.rb'
 
-class LibraryCreatedEvent < Entity
+class LibraryCreatedEvent < Event
   attr_reader :library
 
   def initialize(library)
@@ -14,7 +14,9 @@ class LibraryCreatedEvent < Entity
   end
 
   def apply_to(projection)
-    projection.instance_variable_set(:@id, library.id)
-    projection.instance_variable_set(:@timestamp, library.timestamp)
+    update(projection,
+      :@id => library.id,
+      :@timestamp => library.timestamp
+    )
   end
 end

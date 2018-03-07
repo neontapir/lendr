@@ -13,21 +13,7 @@ class Library < Entity
   end
 
   def self.get(id)
-    events = EventStore.instance.find_all do |e|
-      begin
-        e.library.id == id
-      rescue NoMethodError
-        false
-      end
-    end.sort_by(&:timestamp)
-
-    return nil if events.empty?
-
-    projection = Library.new
-    events.each do |e|
-      e.apply_to(projection)
-    end
-    projection
+    get_by_id(id) { |event| event.library.id }
   end
 
   def add(book)

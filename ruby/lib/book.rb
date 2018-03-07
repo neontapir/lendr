@@ -11,21 +11,7 @@ class Book < Entity
   end
 
   def self.get(id)
-    events = EventStore.instance.find_all do |e|
-      begin
-        e.book.id == id
-      rescue NoMethodError
-        false
-      end
-    end.sort_by(&:timestamp)
-
-    return nil if events.empty?
-
-    projection = Book.new(name: nil, author: nil)
-    events.each do |e|
-      e.apply_to(projection)
-    end
-    projection
+    get_by_id(id) { |event| event.book.id }
   end
 
   def to_s
@@ -34,7 +20,7 @@ class Book < Entity
 
   private
 
-  def initialize(name:, author:)
+  def initialize(name: nil, author: nil)
     super()
     @name = name
     @author = author
