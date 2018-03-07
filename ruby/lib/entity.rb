@@ -1,25 +1,37 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 require_relative 'entity.rb'
 
 class Entity
   attr_reader :id, :timestamp
 
-  def initialize()
+  def initialize
     @id = SecureRandom.uuid
     @timestamp = Time.now
   end
 
-  def self.get_by_id(id, &id_lookup)
+  def ==(other)
+    self.class == other.class && id == other.id
+  end
+
+  alias_method :eql?, :==
+
+  def hash
+    id.hash
+  end
+
+  def self.find_by_id(id, &event_id_lookup)
     events = EventStore.instance.find_all do |e|
       begin
-        id_lookup.call(e) == id
+        id == event_id_lookup.call(e)
       rescue NoMethodError
         false
       end
     end.sort_by(&:timestamp)
     return nil if events.empty?
 
-    projection = self.new
+    projection = new
     events.each { |e| e.apply_to(projection) }
     projection
   end

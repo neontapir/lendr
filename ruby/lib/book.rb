@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'entity.rb'
 require_relative 'events/book_created_event.rb'
 
@@ -11,7 +13,7 @@ class Book < Entity
   end
 
   def self.get(id)
-    get_by_id(id) { |event| event.book.id }
+    find_by_id(id) { |event| event.book.id }
   end
 
   def to_s

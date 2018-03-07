@@ -1,9 +1,13 @@
+# frozen_string_literal: true
+# encoding: utf-8
+
 require_relative '../lib/library.rb'
 
 RSpec.describe 'the event store' do
   context 'getting a book by id' do
-    let (:book) { Book.create(name: 'The Little Prince',
-      author: 'Antoine de Saint-Exupéry') }
+    let(:book) do
+      Book.create(name: 'The Little Prince', author: 'Antoine de Saint-Exupéry')
+    end
 
     it 'gets the book if it exists' do
       subject = Book.get(book.id)
@@ -16,10 +20,10 @@ RSpec.describe 'the event store' do
   end
 
   context 'getting a library by id' do
-    let (:library) { Library.create }
+    let(:library) { Library.create }
 
     it 'gets the library if it exists' do
-      decoy = Library.create # make sure multiple libraries in the store
+      _ = Library.create # make sure multiple libraries in the store
       subject = Library.get(library.id)
       expect(subject.to_s).to eq(library.to_s)
       expect(subject.id).to eq(library.id)
@@ -30,7 +34,7 @@ RSpec.describe 'the event store' do
     it 'gets the updated library after a book is added' do
       old_timestamp = library.timestamp
       little_prince = Book.create(name: 'The Little Prince',
-        author: 'Antoine de Saint-Exupéry')
+                                  author: 'Antoine de Saint-Exupéry')
       library.add little_prince
 
       subject = Library.get(library.id)
@@ -47,9 +51,8 @@ RSpec.describe 'the event store' do
   context 'adding a book to a library' do
     it 'should raise a creation event' do
       library = Library.create
-
       event = EventStore.instance.find do |e|
-        e.is_a?(LibraryCreatedEvent) && e.library.to_s == library.to_s
+        e.is_a?(LibraryCreatedEvent) && e.library.id == library.id
       end
       expect(event).not_to be_nil
     end

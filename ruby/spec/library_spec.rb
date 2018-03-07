@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'timecop'
 require 'uuid'
 require_relative '../lib/book.rb'
@@ -24,22 +26,22 @@ RSpec.describe 'the library' do
   it 'should raise a creation event' do
     expect(subject).not_to be_nil # force let eval
     subject_created = EventStore.instance.any? do |e|
-      e.is_a?(LibraryCreatedEvent) && e.library.to_s == subject.to_s
+      e.is_a?(LibraryCreatedEvent) && e.library.id == subject.id
     end
     expect(subject_created).to be_truthy
   end
 
   context 'when working with a book' do
     book = Book.create(name: 'The Little Prince',
-      author: 'Antoine de Saint-Exupéry')
+                       author: 'Antoine de Saint-Exupéry')
 
     it 'adding a book should raise a book added event' do
       subject.add book
 
       book_added = EventStore.instance.any? do |e|
         e.is_a?(BookAddedEvent) &&
-        e.book.to_s == book.to_s &&
-        e.library.to_s == subject.to_s
+        e.book.id == book.id &&
+        e.library.id == subject.id
       end
       expect(book_added).to be_truthy
     end

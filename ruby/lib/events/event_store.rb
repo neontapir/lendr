@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 require 'singleton'
 
@@ -9,5 +11,5 @@ class EventStore
   end
 
   def_delegators :@list, :empty?, :<<, :size, :map, :any?, :find, :find_all,
-    :to_s
+                 :to_s
 end

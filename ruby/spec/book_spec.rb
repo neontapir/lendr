@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uuid'
 require_relative '../lib/book.rb'
 

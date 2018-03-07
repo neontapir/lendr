@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'books.rb'
 require_relative 'entity.rb'
 require_relative 'events/book_added_event.rb'
@@ -13,7 +15,7 @@ class Library < Entity
   end
 
   def self.get(id)
-    get_by_id(id) { |event| event.library.id }
+    find_by_id(id) { |event| event.library.id }
   end
 
   def add(book)
@@ -27,7 +29,7 @@ class Library < Entity
 
   private
 
-  def initialize()
+  def initialize
     super
     @books = Books.new
   end

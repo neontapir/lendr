@@ -6,3 +6,5 @@ source 'https://rubygems.org'
 
 gem 'timecop'
 gem 'uuid'
+
+gem 'solargraph', :group => 'ide'

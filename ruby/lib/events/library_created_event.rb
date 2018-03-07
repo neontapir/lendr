@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'event.rb'
 require_relative 'event_store.rb'
 
@@ -15,8 +17,7 @@ class LibraryCreatedEvent < Event
 
   def apply_to(projection)
     update(projection,
-      :@id => library.id,
-      :@timestamp => library.timestamp
-    )
+           :@id => library.id,
+           :@timestamp => library.timestamp)
   end
 end
