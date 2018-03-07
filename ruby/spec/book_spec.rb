@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'uuid'
 require_relative '../lib/book.rb'

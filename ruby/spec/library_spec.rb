@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'timecop'
 require 'uuid'
@@ -40,8 +41,8 @@ RSpec.describe 'the library' do
 
       book_added = EventStore.instance.any? do |e|
         e.is_a?(BookAddedEvent) &&
-        e.book.id == book.id &&
-        e.library.id == subject.id
+          e.book.id == book.id &&
+          e.library.id == subject.id
       end
       expect(book_added).to be_truthy
     end
