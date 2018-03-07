@@ -4,7 +4,7 @@ require_relative '../lib/book.rb'
 require_relative '../lib/library.rb'
 
 RSpec.describe 'the library' do
-  let(:subject) { Library.new }
+  let(:subject) { Library.create }
 
   it 'should have a valid ID' do
     expect(UUID.validate(subject.id)).to be_truthy
@@ -14,22 +14,23 @@ RSpec.describe 'the library' do
     expect(subject.books).to be_empty
   end
 
-  it 'should have a valid timestamp' do
+  it 'should have a current timestamp' do
     instant = Time.local(2008, 9, 1, 12, 0, 0) # arbitrary
     Timecop.freeze instant
-    expect(Library.new.timestamp).to eq(instant)
+    expect(Library.create.timestamp).to eq(instant)
     Timecop.return
   end
 
   it 'should raise a creation event' do
+    expect(subject).not_to be_nil # force let eval
     subject_created = EventStore.instance.any? do |e|
-      e.is_a?(LibraryCreatedEvent) && e.library_id == subject.id
+      e.is_a?(LibraryCreatedEvent) && e.library.to_s == subject.to_s
     end
     expect(subject_created).to be_truthy
   end
 
   context 'when working with a book' do
-    book = Book.new(name: 'The Little Prince',
+    book = Book.create(name: 'The Little Prince',
       author: 'Antoine de Saint-Exupéry')
 
     it 'adding a book should raise a book added event' do
@@ -37,8 +38,8 @@ RSpec.describe 'the library' do
 
       book_added = EventStore.instance.any? do |e|
         e.is_a?(BookAddedEvent) &&
-        e.book_id == book.id &&
-        e.library_id == subject.id
+        e.book.to_s == book.to_s &&
+        e.library.to_s == subject.to_s
       end
       expect(book_added).to be_truthy
     end

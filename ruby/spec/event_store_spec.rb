@@ -1,0 +1,57 @@
+require_relative '../lib/library.rb'
+
+RSpec.describe 'the event store' do
+  context 'getting a book by id' do
+    let (:book) { Book.create(name: 'The Little Prince',
+      author: 'Antoine de Saint-Exupéry') }
+
+    it 'gets the book if it exists' do
+      subject = Book.get(book.id)
+      expect(subject.to_s).to eq(book.to_s)
+      expect(subject.id).to eq(book.id)
+      expect(subject.timestamp).to eq(book.timestamp)
+      expect(subject.name).to eq(book.name)
+      expect(subject.author).to eq(book.author)
+    end
+  end
+
+  context 'getting a library by id' do
+    let (:library) { Library.create }
+
+    it 'gets the library if it exists' do
+      decoy = Library.create # make sure multiple libraries in the store
+      subject = Library.get(library.id)
+      expect(subject.to_s).to eq(library.to_s)
+      expect(subject.id).to eq(library.id)
+      expect(subject.timestamp).to eq(library.timestamp)
+      expect(subject.books).to be_empty
+    end
+
+    it 'gets the updated library after a book is added' do
+      old_timestamp = library.timestamp
+      little_prince = Book.create(name: 'The Little Prince',
+        author: 'Antoine de Saint-Exupéry')
+      library.add little_prince
+
+      subject = Library.get(library.id)
+      expect(subject.timestamp).to be > old_timestamp
+      expect(subject.books).to contain_exactly(little_prince)
+    end
+
+    it 'get returns nil if the entity does not exist' do
+      subject = Library.get('xyzzy') # invalid key
+      expect(subject).to be_nil
+    end
+  end
+
+  context 'adding a book to a library' do
+    it 'should raise a creation event' do
+      library = Library.create
+
+      event = EventStore.instance.find do |e|
+        e.is_a?(LibraryCreatedEvent) && e.library.to_s == library.to_s
+      end
+      expect(event).not_to be_nil
+    end
+  end
+end

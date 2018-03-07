@@ -8,5 +8,6 @@ class EventStore
     @list = list
   end
 
-  def_delegators :@list, :empty?, :<<, :size, :map, :any?
+  def_delegators :@list, :empty?, :<<, :size, :map, :any?, :find, :find_all,
+    :to_s
 end
