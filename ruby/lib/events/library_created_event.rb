@@ -18,6 +18,7 @@ class LibraryCreatedEvent < Event
   def apply_to(projection)
     update(projection,
            :@id => library.id,
+           :@name => library.name,
            :@timestamp => library.timestamp)
   end
 end

@@ -20,10 +20,10 @@ RSpec.describe 'the event store' do
   end
 
   context 'getting a library by id' do
-    let(:library) { Library.create }
+    let(:library) { Library.create 'get by id test library' }
 
     it 'gets the library if it exists' do
-      _ = Library.create # make sure multiple libraries in the store
+      _ = Library.create 'make sure multiple libraries in the store library'
       subject = Library.get(library.id)
       expect(subject.to_s).to eq(library.to_s)
       expect(subject.id).to eq(library.id)
@@ -39,7 +39,7 @@ RSpec.describe 'the event store' do
 
       subject = Library.get(library.id)
       expect(subject.timestamp).to be > old_timestamp
-      expect(subject.books).to contain_exactly(little_prince)
+      expect(subject.books).to contain_exactly([little_prince, 1])
     end
 
     it 'get returns nil if the entity does not exist' do
@@ -50,7 +50,7 @@ RSpec.describe 'the event store' do
 
   context 'adding a book to a library' do
     it 'should raise a creation event' do
-      library = Library.create
+      library = Library.create 'creation event test library'
       event = EventStore.instance.find do |e|
         e.is_a?(LibraryCreatedEvent) && e.library.id == library.id
       end
