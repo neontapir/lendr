@@ -5,17 +5,17 @@ require 'uuid'
 require_relative '../lib/book.rb'
 
 RSpec.describe 'the book' do
-  name = 'The Little Prince'
+  title = 'The Little Prince'
   author = 'Antoine de Saint-Exupéry'
-  let(:subject) { Book.create(name: name, author: author) }
+  let(:subject) { Book.create(title: title, author: author) }
 
   context 'when creating a new book' do
     it 'should have a valid ID' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
 
-    it 'should have a name and author' do
-      expect(subject.name).to eq(name)
+    it 'should have a title and author' do
+      expect(subject.title).to eq(title)
       expect(subject.author.name).to eq(author)
     end
 
@@ -29,10 +29,10 @@ RSpec.describe 'the book' do
   end
 
   context 'when trying to create an existing book' do
-    name = 'The Martian'
+    title = 'The Martian'
     author = 'Andy Weir'
-    let(:first) { Book.create(name: name, author: author) }
-    let(:duplicate) { Book.create(name: name, author: author) }
+    let(:first) { Book.create(title: title, author: author) }
+    let(:duplicate) { Book.create(title: title, author: author) }
 
     it 'should return the first one instead' do
       expect(first).to eq(duplicate)

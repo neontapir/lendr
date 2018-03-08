@@ -34,7 +34,7 @@ RSpec.describe 'the library' do
 
   context 'when adding books to the library' do
     it 'adding a book should raise a book added event' do
-      book = Book.create(name: 'The Little Prince',
+      book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
       subject.add book
 
@@ -48,7 +48,7 @@ RSpec.describe 'the library' do
 
     it 'adding a new book makes 1 copy in the library' do
       library = Library.create 'single copy library'
-      little_prince = Book.create(name: 'The Little Prince',
+      little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       expect(library.books).to contain_exactly([little_prince, 1])
@@ -56,7 +56,7 @@ RSpec.describe 'the library' do
 
     it 'adding the same book increments the quantity of that book by 1' do
       library = Library.create 'multiple copies library'
-      little_prince = Book.create(name: 'The Little Prince',
+      little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       library.add little_prince
@@ -65,13 +65,13 @@ RSpec.describe 'the library' do
 
     it 'adding a new book works with an existing library that already has a different book' do
       library = Library.create 'multiple books library'
-      little_prince = Book.create(name: 'The Little Prince',
+      little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       expect(library.books).to include(little_prince)
       expect(library.books[little_prince]).to be 1
 
-      dune = Book.create(name: 'Dune',
+      dune = Book.create(title: 'Dune',
                          author: 'Frank Herbert')
       library.add dune
 
@@ -81,11 +81,11 @@ RSpec.describe 'the library' do
 
     it 'adds a new book correctly with multiple books in the library' do
       library = Library.create 'multiple books addition library'
-      little_prince = Book.create(name: 'The Little Prince',
+      little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
 
-      dune = Book.create(name: 'Dune',
+      dune = Book.create(title: 'Dune',
                          author: 'Frank Herbert')
       library.add dune
       library.add dune
@@ -98,7 +98,7 @@ RSpec.describe 'the library' do
   context 'when removing books from the library' do
     it 'removing a book should raise a book removed event' do
       subject = Library.create 'the removing books library'
-      book = Book.create(name: 'The Little Prince',
+      book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
       subject.add book
       subject.remove book
@@ -113,7 +113,7 @@ RSpec.describe 'the library' do
 
     it 'removing a book means 1 less copy in the library' do
       subject = Library.create 'removing 1984 library'
-      nineteen_eighty_four = Book.create(name: '1984',
+      nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
       subject.add nineteen_eighty_four
@@ -125,7 +125,7 @@ RSpec.describe 'the library' do
 
     it 'removing the last copy of a book also removes it from the collection' do
       subject = Library.create 'removing all 1984 copies library'
-      nineteen_eighty_four = Book.create(name: '1984',
+      nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
       expect(subject.books).to contain_exactly([nineteen_eighty_four, 1])
@@ -136,7 +136,7 @@ RSpec.describe 'the library' do
 
     it 'removing a non-existant book is a no-op' do
       subject = Library.create 'removing book from empty library'
-      nineteen_eighty_four = Book.create(name: '1984',
+      nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
 
       subject.remove nineteen_eighty_four

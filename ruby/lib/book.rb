@@ -5,12 +5,12 @@ require_relative 'entity.rb'
 require_relative 'events/book_created_event.rb'
 
 class Book < Entity
-  attr_reader :name, :author
+  attr_reader :title, :author
 
-  def self.create(name:, author:)
-    book = find_by_attributes { |event| name == event.book.name && author == event.book.author.name }
+  def self.create(title:, author:)
+    book = find_by_attributes { |event| title == event.book.title && author == event.book.author.name }
     unless book
-      book = Book.new(name: name, author: Author.create(author))
+      book = Book.new(title: title, author: Author.create(author))
       BookCreatedEvent.raise book
     end
     book
@@ -26,9 +26,9 @@ class Book < Entity
 
   private
 
-  def initialize(name: nil, author: nil)
+  def initialize(title: nil, author: nil)
     super()
-    @name = name
+    @title = title
     @author = author
   end
 end

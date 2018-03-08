@@ -19,7 +19,7 @@ class BookCreatedEvent < Event
     update(projection,
            :@id => book.id,
            :@timestamp => book.timestamp,
-           :@name => book.name,
+           :@title => book.title,
            :@author => book.author)
   end
 end

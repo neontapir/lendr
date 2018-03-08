@@ -6,7 +6,7 @@ require_relative '../lib/library.rb'
 RSpec.describe 'the event store' do
   context 'getting a book by id' do
     let(:book) do
-      Book.create(name: 'The Little Prince', 
+      Book.create(title: 'The Little Prince', 
                   author: 'Antoine de Saint-Exupéry')
     end
 
@@ -15,7 +15,7 @@ RSpec.describe 'the event store' do
       expect(subject.to_s).to eq(book.to_s)
       expect(subject.id).to eq(book.id)
       expect(subject.timestamp).to eq(book.timestamp)
-      expect(subject.name).to eq(book.name)
+      expect(subject.title).to eq(book.title)
       expect(subject.author).to eq(book.author)
     end
   end
@@ -34,7 +34,7 @@ RSpec.describe 'the event store' do
 
     it 'gets the updated library after a book is added' do
       old_timestamp = library.timestamp
-      little_prince = Book.create(name: 'The Little Prince',
+      little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
 
