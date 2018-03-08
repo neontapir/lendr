@@ -94,4 +94,60 @@ RSpec.describe 'the library' do
       expect(library.books[dune]).to be 2
     end
   end
+
+  context 'when removing books from the library' do
+    it 'removing a book should raise a book removed event' do
+      subject = Library.create 'the removing books library'
+      book = Book.create(name: 'The Little Prince',
+                         author: 'Antoine de Saint-Exupéry')
+      subject.add book
+      subject.remove book
+
+      book_removed = EventStore.instance.any? do |e|
+        e.is_a?(BookRemovedEvent) &&
+          e.book.id == book.id &&
+          e.library.id == subject.id
+      end
+      expect(book_removed).to be_truthy
+    end
+
+    it 'removing a book means 1 less copy in the library' do
+      subject = Library.create 'removing 1984 library'
+      nineteen_eighty_four = Book.create(name: '1984',
+                                         author: 'George Orwell')
+      subject.add nineteen_eighty_four
+      subject.add nineteen_eighty_four
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, 2])
+
+      subject.remove nineteen_eighty_four
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, 1])
+    end
+
+    it 'removing the last copy of a book also removes it from the collection' do
+      subject = Library.create 'removing all 1984 copies library'
+      nineteen_eighty_four = Book.create(name: '1984',
+                                         author: 'George Orwell')
+      subject.add nineteen_eighty_four
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, 1])
+
+      subject.remove nineteen_eighty_four
+      expect(subject.books).to be_empty
+    end
+
+    it 'removing a non-existant book is a no-op' do
+      subject = Library.create 'removing book from empty library'
+      nineteen_eighty_four = Book.create(name: '1984',
+                                         author: 'George Orwell')
+
+      subject.remove nineteen_eighty_four
+      expect(subject.books).to be_empty
+
+      book_removed = EventStore.instance.any? do |e|
+        e.is_a?(BookRemovedEvent) &&
+          e.book.id == nineteen_eighty_four.id &&
+          e.library.id == subject.id
+      end
+      expect(book_removed).to be_falsey
+    end
+  end
 end

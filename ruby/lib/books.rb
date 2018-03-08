@@ -11,5 +11,6 @@ class Books < Entity
     @list = list
   end
 
-  def_delegators :@list, :empty?, :[], :[]=, :size, :map, :include?, :to_a
+  def_delegators :@list, :empty?, :[], :[]=, :size, :map, :key?,
+                 :delete, :include?, :each, :each_pair, :to_a
 end

@@ -6,7 +6,8 @@ require_relative '../lib/library.rb'
 RSpec.describe 'the event store' do
   context 'getting a book by id' do
     let(:book) do
-      Book.create(name: 'The Little Prince', author: 'Antoine de Saint-Exupéry')
+      Book.create(name: 'The Little Prince', 
+                  author: 'Antoine de Saint-Exupéry')
     end
 
     it 'gets the book if it exists' do
