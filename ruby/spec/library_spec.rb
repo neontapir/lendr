@@ -8,49 +8,52 @@ require_relative '../lib/library.rb'
 
 RSpec.describe 'the library' do
   let(:subject) { Library.create 'the library spec' }
-
-  it 'should have a valid ID' do
-    expect(UUID.validate(subject.id)).to be_truthy
-  end
-
-  it 'should have an empty books collection' do
-    expect(subject.books).to be_empty
-  end
-
-  it 'should have an empty patrons collection' do
-    expect(subject.patrons).to be_empty
-  end
-
-  it 'should have a current timestamp' do
-    instant = Time.local(2008, 9, 1, 12, 0, 0) # arbitrary
-    Timecop.freeze instant
-    expect(Library.create('timestamp test library').timestamp).to eq(instant)
-    Timecop.return
-  end
-
-  it 'should raise a creation event' do
-    expect(subject).not_to be_nil # force let to be evaluated
-    subject_created = EventStore.instance.any? do |e|
-      e.is_a?(LibraryCreatedEvent) && e.library.id == subject.id
+  
+  context 'a new library' do
+    
+    it 'should have a valid ID' do
+      expect(UUID.validate(subject.id)).to be_truthy
     end
-    expect(subject_created).to be_truthy
+
+    it 'should have an empty books collection' do
+      expect(subject.books).to be_empty
+    end
+
+    it 'should have an empty patrons collection' do
+      expect(subject.patrons).to be_empty
+    end
+
+    it 'should have a current timestamp' do
+      instant = Time.local(2008, 9, 1, 12, 0, 0) # arbitrary
+      Timecop.freeze instant
+      expect(Library.create('timestamp test library').timestamp).to eq(instant)
+      Timecop.return
+    end
+
+    it 'should raise a creation event' do
+      expect(subject).not_to be_nil # force let to be evaluated
+      subject_created = EventStore.instance.any? do |e|
+        e.is_a?(LibraryCreatedEvent) && e.library.id == subject.id
+      end
+      expect(subject_created).to be_truthy
+    end
   end
 
-  context 'when adding books to the library' do
-    it 'adding a book should raise a book added event' do
+  context 'adding a book to the library' do
+    it 'should raise a book copy added event' do
       book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
       subject.add book
 
       book_added = EventStore.instance.any? do |e|
-        e.is_a?(BookAddedEvent) &&
+        e.is_a?(BookCopyAddedEvent) &&
           e.book.id == book.id &&
           e.library.id == subject.id
       end
       expect(book_added).to be_truthy
     end
 
-    it 'adding a new book makes 1 copy in the library' do
+    it 'a new book results in 1 copy in the library' do
       library = Library.create 'single copy library'
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
@@ -58,7 +61,7 @@ RSpec.describe 'the library' do
       expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
-    it 'adding the same book increments the quantity of that book by 1' do
+    it 'an existing book increments the quantity of that book by 1' do
       library = Library.create 'multiple copies library'
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
@@ -67,7 +70,7 @@ RSpec.describe 'the library' do
       expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 2, in_circulation: 2)])
     end
 
-    it 'adding a new book works with an existing library that already has a different book' do
+    it 'a new book can be added to a library that already has a different book' do
       library = Library.create 'multiple books library'
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
@@ -83,7 +86,7 @@ RSpec.describe 'the library' do
       expect(library.books[dune]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
     end
 
-    it 'adds a new book correctly with multiple books in the library' do
+    it 'a new book can be added with multiple books in the library' do
       library = Library.create 'multiple books addition library'
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
@@ -99,8 +102,8 @@ RSpec.describe 'the library' do
     end
   end
 
-  context 'when removing books from the library' do
-    it 'removing a book should raise a book removed event' do
+  context 'removing a book' do
+    it 'should raise a book copy removed event' do
       subject = Library.create 'the removing books library'
       book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
@@ -108,14 +111,14 @@ RSpec.describe 'the library' do
       subject.remove book
 
       book_removed = EventStore.instance.any? do |e|
-        e.is_a?(BookRemovedEvent) &&
+        e.is_a?(BookCopyRemovedEvent) &&
           e.book.id == book.id &&
           e.library.id == subject.id
       end
       expect(book_removed).to be_truthy
     end
 
-    it 'removing a book means 1 less copy in the library' do
+    it 'means 1 less copy owned by the library' do
       subject = Library.create 'removing 1984 library'
       nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
@@ -127,7 +130,7 @@ RSpec.describe 'the library' do
       expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
-    it 'removing the last copy of a book also removes it from the collection' do
+    it 'removes it from the library\'s collection if it is the last book owned' do
       subject = Library.create 'removing all 1984 copies library'
       nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
@@ -147,7 +150,7 @@ RSpec.describe 'the library' do
       expect(subject.books).to be_empty
 
       book_removed = EventStore.instance.any? do |e|
-        e.is_a?(BookRemovedEvent) &&
+        e.is_a?(BookCopyRemovedEvent) &&
           e.book.id == nineteen_eighty_four.id &&
           e.library.id == subject.id
       end
@@ -155,7 +158,7 @@ RSpec.describe 'the library' do
     end
   end
 
-  context 'when registering patrons for the library' do
+  context 'registering a new patron' do
     it 'should raise a patron registered event' do
       patron = Patron.create 'John Doe'
       subject.register_patron patron
@@ -168,7 +171,7 @@ RSpec.describe 'the library' do
       expect(patron_registered).to be_truthy
     end
 
-    it 'new patrons are in good standing' do
+    it 'puts the person in good standing' do
       patron = Patron.create 'Jane Doe'
       subject.register_patron patron
 

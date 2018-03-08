@@ -9,7 +9,7 @@ RSpec.describe 'the book' do
   author = 'Antoine de Saint-Exupéry'
   let(:subject) { Book.create(title: title, author: author) }
 
-  context 'when creating a new book' do
+  context 'a new book' do
     it 'should have a valid ID' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
@@ -19,7 +19,7 @@ RSpec.describe 'the book' do
       expect(subject.author.name).to eq(author)
     end
 
-    it 'should raise a creation event' do
+    it 'should raise a book creation event' do
       expect(subject).not_to be_nil # force let eval
       subject_created = EventStore.instance.any? do |e|
         e.is_a?(BookCreatedEvent) && e.book.to_s == subject.to_s
@@ -28,7 +28,7 @@ RSpec.describe 'the book' do
     end
   end
 
-  context 'when trying to create an existing book' do
+  context 'trying to create an existing book' do
     title = 'The Martian'
     author = 'Andy Weir'
     let(:first) { Book.create(title: title, author: author) }
@@ -38,7 +38,7 @@ RSpec.describe 'the book' do
       expect(first).to eq(duplicate)
     end
 
-    it 'should only trigger one book created event' do
+    it 'should not raise a book created event' do
       book_created_events = EventStore.instance.find_all do |e|
         e.is_a?(BookCreatedEvent) && e.book == first
       end

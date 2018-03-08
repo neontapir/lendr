@@ -8,7 +8,7 @@ RSpec.describe 'the author' do
   name = 'Frank Herbert'
   let(:subject) { Author.create(name) }
 
-  context 'when creating a new author' do
+  context 'a new author' do
     it 'should have a valid ID' do
       expect(subject).not_to be_nil # force let eval
       expect(UUID.validate(subject.id)).to be_truthy
@@ -28,7 +28,7 @@ RSpec.describe 'the author' do
     end
   end
 
-  context 'when trying to create an existing author' do
+  context 'trying to create an existing author' do
     name = 'Andy Weir'
     let(:first) { Author.create(name) }
     let(:duplicate) { Author.create(name) }
@@ -37,7 +37,7 @@ RSpec.describe 'the author' do
       expect(first).to eq(duplicate)
     end
 
-    it 'should only trigger one author created event' do
+    it 'should not raise an author created event' do
       author_created_events = EventStore.instance.find_all do |e|
         e.is_a?(AuthorCreatedEvent) && e.author == first
       end

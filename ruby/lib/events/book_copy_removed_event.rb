@@ -3,7 +3,7 @@
 require_relative 'event.rb'
 require_relative 'event_store.rb'
 
-class BookRemovedEvent < Event
+class BookCopyRemovedEvent < Event
   attr_reader :library, :book
 
   def initialize(library:, book:)
@@ -13,7 +13,7 @@ class BookRemovedEvent < Event
   end
 
   def self.raise(library:, book:)
-    EventStore.instance << BookRemovedEvent.new(library: library, book: book)
+    EventStore.instance << BookCopyRemovedEvent.new(library: library, book: book)
   end
 
   def apply_to(projection)

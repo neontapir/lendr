@@ -8,7 +8,7 @@ RSpec.describe 'the patron' do
   name = 'John Doe'
   let(:subject) { Patron.create(name) }
 
-  context 'when creating a new patron' do
+  context 'a newly created patron' do
     it 'should have a valid ID' do
       expect(subject).not_to be_nil # force let eval
       expect(UUID.validate(subject.id)).to be_truthy
@@ -33,7 +33,7 @@ RSpec.describe 'the patron' do
     end
   end
 
-  context 'when trying to create an existing patron' do
+  context 'trying to create an already-existing patron' do
     name = 'Jane Doe'
     let(:first) { Patron.create(name) }
     let(:duplicate) { Patron.create(name) }
@@ -42,7 +42,7 @@ RSpec.describe 'the patron' do
       expect(first).to eq(duplicate)
     end
 
-    it 'should only trigger one patron created event' do
+    it 'should not raise a patron created event' do
       patron_created_events = EventStore.instance.find_all do |e|
         e.is_a?(PatronCreatedEvent) && e.patron == first
       end

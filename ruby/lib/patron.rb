@@ -16,7 +16,7 @@ class Patron < Person
   end
 
   def self.get(id)
-    find_by_attributes { |event| id == event.patron.id }
+    find_by_id(id) { |event| event.patron.id }
   end
 
   def to_s
