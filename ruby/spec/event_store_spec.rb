@@ -59,4 +59,17 @@ RSpec.describe 'the event store' do
       expect(event).not_to be_nil
     end
   end
+
+  context 'getting a patron by id' do
+    it 'gets the patron if it exists' do
+      patron = Patron.create('John Doe')
+      subject = Patron.get(patron.id)
+      
+      expect(subject.to_s).to eq(patron.to_s)
+      expect(subject.id).to eq(patron.id)
+      expect(subject.timestamp).to eq(patron.timestamp)
+      expect(subject.name).to eq(patron.name)
+      expect(subject.books).to eq(patron.books)
+    end
+  end
 end

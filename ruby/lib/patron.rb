@@ -5,7 +5,7 @@ require_relative 'events/patron_created_event.rb'
 
 class Patron < Person
   attr_reader :books
-  
+
   def self.create(name)
     patron = find_by_attributes { |event| name == event.patron.name }
     unless patron
@@ -16,7 +16,7 @@ class Patron < Person
   end
 
   def self.get(id)
-    find_by_attributes { |event| PatronCreatedEvent.class == event.class && id == event.patron.id }
+    find_by_attributes { |event| id == event.patron.id }
   end
 
   def to_s

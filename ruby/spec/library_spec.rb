@@ -17,6 +17,10 @@ RSpec.describe 'the library' do
     expect(subject.books).to be_empty
   end
 
+  it 'should have an empty patrons collection' do
+    expect(subject.patrons).to be_empty
+  end
+
   it 'should have a current timestamp' do
     instant = Time.local(2008, 9, 1, 12, 0, 0) # arbitrary
     Timecop.freeze instant
@@ -148,6 +152,37 @@ RSpec.describe 'the library' do
           e.library.id == subject.id
       end
       expect(book_removed).to be_falsey
+    end
+  end
+
+  context 'when registering patrons for the library' do
+    it 'should raise a patron registered event' do
+      patron = Patron.create 'John Doe'
+      subject.register_patron patron
+
+      patron_registered = EventStore.instance.any? do |e|
+        e.is_a?(PatronRegisteredEvent) &&
+          e.patron.id == patron.id &&
+          e.library.id == subject.id
+      end
+      expect(patron_registered).to be_truthy
+    end
+
+    it 'new patrons are in good standing' do
+      patron = Patron.create 'Jane Doe'
+      subject.register_patron patron
+
+      expect(subject.patrons[patron].standing).to eq :good
+    end
+
+    it 'should not affect the standing of the patron at a different library' do
+      library1 = Library.create 'First library for registering patrons'
+      library2 = Library.create 'Second library for registering patrons'
+      patron = Patron.create 'Jane Doe'
+      library1.register_patron patron
+
+      expect(library1.patrons[patron].standing).to eq :good
+      expect(library2.patrons[patron].standing).to eq :none
     end
   end
 end
