@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'author.rb'
 require_relative 'entity.rb'
 require_relative 'events/book_created_event.rb'
 
@@ -7,9 +8,9 @@ class Book < Entity
   attr_reader :name, :author
 
   def self.create(name:, author:)
-    book = find_by_attributes { |event| name == event.book.name && author == event.book.author }
+    book = find_by_attributes { |event| name == event.book.name && author == event.book.author.name }
     unless book
-      book = Book.new(name: name, author: author)
+      book = Book.new(name: name, author: Author.create(author))
       BookCreatedEvent.raise book
     end
     book

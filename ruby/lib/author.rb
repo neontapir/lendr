@@ -16,7 +16,7 @@ class Author < Entity
   end
 
   def self.get(id)
-    find_by_id(id) { |event| event.author.id }
+    find_by_attributes { |event| AuthorCreatedEvent.class == event.class && id == event.author.id }
   end
 
   def to_s

@@ -16,7 +16,7 @@ RSpec.describe 'the book' do
 
     it 'should have a name and author' do
       expect(subject.name).to eq(name)
-      expect(subject.author).to eq(author)
+      expect(subject.author.name).to eq(author)
     end
 
     it 'should raise a creation event' do
