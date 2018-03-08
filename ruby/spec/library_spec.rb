@@ -51,7 +51,7 @@ RSpec.describe 'the library' do
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
-      expect(library.books).to contain_exactly([little_prince, 1])
+      expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
     it 'adding the same book increments the quantity of that book by 1' do
@@ -60,7 +60,7 @@ RSpec.describe 'the library' do
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       library.add little_prince
-      expect(library.books).to contain_exactly([little_prince, 2])
+      expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 2, in_circulation: 2)])
     end
 
     it 'adding a new book works with an existing library that already has a different book' do
@@ -69,14 +69,14 @@ RSpec.describe 'the library' do
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       expect(library.books).to include(little_prince)
-      expect(library.books[little_prince]).to be 1
+      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
 
       dune = Book.create(title: 'Dune',
                          author: 'Frank Herbert')
       library.add dune
 
-      expect(library.books[little_prince]).to be 1
-      expect(library.books[dune]).to be 1
+      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[dune]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
     end
 
     it 'adds a new book correctly with multiple books in the library' do
@@ -90,8 +90,8 @@ RSpec.describe 'the library' do
       library.add dune
       library.add dune
 
-      expect(library.books[little_prince]).to be 1
-      expect(library.books[dune]).to be 2
+      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[dune]).to eq BookDisposition.new(owned: 2, in_circulation: 2)
     end
   end
 
@@ -117,10 +117,10 @@ RSpec.describe 'the library' do
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
       subject.add nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, 2])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 2, in_circulation: 2)])
 
       subject.remove nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, 1])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
     it 'removing the last copy of a book also removes it from the collection' do
@@ -128,7 +128,7 @@ RSpec.describe 'the library' do
       nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, 1])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 1, in_circulation: 1)])
 
       subject.remove nineteen_eighty_four
       expect(subject.books).to be_empty

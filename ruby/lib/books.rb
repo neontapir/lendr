@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require_relative 'book_disposition.rb'
 require_relative 'entity.rb'
 
 class Books < Entity
   extend Forwardable
 
-  def initialize(list = Hash.new(0))
+  def initialize(list = Hash.new(BookDisposition.none))
     super()
     @list = list
   end

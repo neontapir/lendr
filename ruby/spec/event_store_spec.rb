@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
+require_relative '../lib/book_disposition.rb'
 require_relative '../lib/library.rb'
 
 RSpec.describe 'the event store' do
@@ -40,7 +41,7 @@ RSpec.describe 'the event store' do
 
       subject = Library.get(library.id)
       expect(subject.timestamp).to be > old_timestamp
-      expect(subject.books).to contain_exactly([little_prince, 1])
+      expect(subject.books).to contain_exactly([little_prince, BookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
     it 'get returns nil if the entity does not exist' do

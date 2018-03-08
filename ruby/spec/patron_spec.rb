@@ -5,7 +5,7 @@ require 'uuid'
 require_relative '../lib/patron.rb'
 
 RSpec.describe 'the patron' do
-  name = 'Frank Herbert'
+  name = 'John Doe'
   let(:subject) { Patron.create(name) }
 
   context 'when creating a new patron' do
@@ -34,7 +34,7 @@ RSpec.describe 'the patron' do
   end
 
   context 'when trying to create an existing patron' do
-    name = 'Andy Weir'
+    name = 'Jane Doe'
     let(:first) { Patron.create(name) }
     let(:duplicate) { Patron.create(name) }
 
