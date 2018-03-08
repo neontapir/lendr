@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'entity.rb'
+require_relative 'person.rb'
 require_relative 'events/author_created_event.rb'
 
-class Author < Entity
-  attr_reader :name
-
+class Author < Person
   def self.create(name)
     author = find_by_attributes { |event| name == event.author.name }
     unless author
@@ -26,7 +24,6 @@ class Author < Entity
   private
 
   def initialize(name = nil)
-    super()
-    @name = name
+    super(name)
   end
 end
