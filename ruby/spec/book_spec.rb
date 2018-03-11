@@ -10,7 +10,7 @@ RSpec.describe 'the book' do
   let(:subject) { Book.create(title: title, author: author) }
 
   context 'a new book' do
-    it 'should have a valid ID' do
+    it 'should have a valid UUID as an identifier' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
 

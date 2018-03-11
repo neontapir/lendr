@@ -9,7 +9,7 @@ RSpec.describe 'the author' do
   let(:subject) { Author.create(name) }
 
   context 'a new author' do
-    it 'should have a valid ID' do
+    it 'should have a valid UUID as an identifier' do
       expect(subject).not_to be_nil # force let eval
       expect(UUID.validate(subject.id)).to be_truthy
     end

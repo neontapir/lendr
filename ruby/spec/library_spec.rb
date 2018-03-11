@@ -11,7 +11,7 @@ RSpec.describe 'the library' do
   
   context 'a new library' do
     
-    it 'should have a valid ID' do
+    it 'should have a valid UUID as an identifier' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
 

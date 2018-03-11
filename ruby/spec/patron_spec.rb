@@ -9,7 +9,7 @@ RSpec.describe 'the patron' do
   let(:subject) { Patron.create(name) }
 
   context 'a newly created patron' do
-    it 'should have a valid ID' do
+    it 'should have a valid UUID as an identifier' do
       expect(subject).not_to be_nil # force let eval
       expect(UUID.validate(subject.id)).to be_truthy
     end
