@@ -1,0 +1,1 @@
+This repository contains a sample application for book inventory management, designed to showcase the use of event sourcing. Domain events get fired and added to a source, then objects getters use a projection to apply all the changes in the event source.
