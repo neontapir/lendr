@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require_relative '../lib/book_disposition.rb'
 require_relative '../lib/library.rb'
+require_relative '../lib/library_book_disposition.rb'
 
 RSpec.describe 'the event store' do
   context 'getting an author by id' do
@@ -67,7 +67,7 @@ RSpec.describe 'the event store' do
 
       subject = Library.get(library.id)
       expect(subject.timestamp).to be > old_timestamp
-      expect(subject.books).to contain_exactly([little_prince, BookDisposition.new(owned: 1, in_circulation: 1)])
+      expect(subject.books).to contain_exactly([little_prince, LibraryBookDisposition.new(owned: 1, in_circulation: 1)])
     end
   end
 

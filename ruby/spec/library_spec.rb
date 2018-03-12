@@ -59,7 +59,7 @@ RSpec.describe 'the library' do
       little_prince = Book.create(title: 'The Little Prince',
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
-      expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 1, in_circulation: 1)])
+      expect(library.books).to contain_exactly([little_prince, LibraryBookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
     it 'an existing book increments the quantity of that book by 1' do
@@ -68,7 +68,7 @@ RSpec.describe 'the library' do
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       library.add little_prince
-      expect(library.books).to contain_exactly([little_prince, BookDisposition.new(owned: 2, in_circulation: 2)])
+      expect(library.books).to contain_exactly([little_prince, LibraryBookDisposition.new(owned: 2, in_circulation: 2)])
     end
 
     it 'a new book can be added to a library that already has a different book' do
@@ -77,14 +77,14 @@ RSpec.describe 'the library' do
                                   author: 'Antoine de Saint-Exupéry')
       library.add little_prince
       expect(library.books).to include(little_prince)
-      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[little_prince]).to eq LibraryBookDisposition.new(owned: 1, in_circulation: 1)
 
       dune = Book.create(title: 'Dune',
                          author: 'Frank Herbert')
       library.add dune
 
-      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
-      expect(library.books[dune]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[little_prince]).to eq LibraryBookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[dune]).to eq LibraryBookDisposition.new(owned: 1, in_circulation: 1)
     end
 
     it 'a new book can be added with multiple books in the library' do
@@ -98,8 +98,8 @@ RSpec.describe 'the library' do
       library.add dune
       library.add dune
 
-      expect(library.books[little_prince]).to eq BookDisposition.new(owned: 1, in_circulation: 1)
-      expect(library.books[dune]).to eq BookDisposition.new(owned: 2, in_circulation: 2)
+      expect(library.books[little_prince]).to eq LibraryBookDisposition.new(owned: 1, in_circulation: 1)
+      expect(library.books[dune]).to eq LibraryBookDisposition.new(owned: 2, in_circulation: 2)
     end
   end
 
@@ -125,10 +125,10 @@ RSpec.describe 'the library' do
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
       subject.add nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 2, in_circulation: 2)])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, LibraryBookDisposition.new(owned: 2, in_circulation: 2)])
 
       subject.remove nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 1, in_circulation: 1)])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, LibraryBookDisposition.new(owned: 1, in_circulation: 1)])
     end
 
     it 'removes it from the library\'s collection if it is the last book owned' do
@@ -136,7 +136,7 @@ RSpec.describe 'the library' do
       nineteen_eighty_four = Book.create(title: '1984',
                                          author: 'George Orwell')
       subject.add nineteen_eighty_four
-      expect(subject.books).to contain_exactly([nineteen_eighty_four, BookDisposition.new(owned: 1, in_circulation: 1)])
+      expect(subject.books).to contain_exactly([nineteen_eighty_four, LibraryBookDisposition.new(owned: 1, in_circulation: 1)])
 
       subject.remove nineteen_eighty_four
       expect(subject.books).to be_empty
@@ -203,8 +203,7 @@ RSpec.describe 'the library' do
     it 'the preconditions are correct' do
       expect(library_books_before[left_hand_darkness].owned).to eq 1
       expect(library_books_before[left_hand_darkness].in_circulation).to eq 1
-      expect(patron_books_before[left_hand_darkness].owned).to eq 0
-      expect(patron_books_before[left_hand_darkness].in_circulation).to eq 0
+      expect(patron_books_before[left_hand_darkness].borrowed).to eq 0
     end
 
     it 'raise a book leant event' do
@@ -233,8 +232,7 @@ RSpec.describe 'the library' do
     end
 
     it 'becomes owned by the patron' do
-      expect(pierre.books[left_hand_darkness].owned).to eq 1
-      expect(pierre.books[left_hand_darkness].in_circulation).to eq 0
+      expect(pierre.books[left_hand_darkness].borrowed).to eq 1
     end
   end
 end

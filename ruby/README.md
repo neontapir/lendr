@@ -100,9 +100,10 @@ the patron
 
 The process is pretty straightforward:
 
-- create a new event (example: BookLeantEvent)
+- create a new event (example: LibraryLeantBookEvent)
 - add a method to the orchestrating domain object (Library)
 - add a require statement to pull in the event file
+- add a test to exercise check that the new event is fired
 
 ## Support
 

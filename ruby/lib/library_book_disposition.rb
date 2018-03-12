@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class BookDisposition
+class LibraryBookDisposition
   attr_accessor :owned, :in_circulation
 
   def self.none
-    BookDisposition.new(owned: 0, in_circulation: 0)
+    LibraryBookDisposition.new(owned: 0, in_circulation: 0)
   end
 
   def initialize(owned:, in_circulation:)
@@ -13,7 +13,7 @@ class BookDisposition
   end
 
   def add_owned(quantity)
-    BookDisposition.new(owned: owned + quantity, in_circulation: in_circulation)
+    LibraryBookDisposition.new(owned: owned + quantity, in_circulation: in_circulation)
   end
 
   def subtract_owned(quantity)
@@ -21,7 +21,7 @@ class BookDisposition
   end
 
   def add_in_circulation(quantity)
-    BookDisposition.new(owned: owned, in_circulation: in_circulation + quantity)
+    LibraryBookDisposition.new(owned: owned, in_circulation: in_circulation + quantity)
   end
 
   def subtract_in_circulation(quantity)

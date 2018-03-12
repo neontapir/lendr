@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'books.rb'
-require_relative 'book_disposition.rb'
+require_relative 'library_books.rb'
 require_relative 'entity.rb'
 require_relative 'patrons.rb'
 require_relative 'events/book_copy_added_event.rb'
@@ -58,7 +57,7 @@ class Library < Entity
   def initialize(name: nil)
     super()
     @name = name
-    @books = Books.new
+    @books = LibraryBooks.new
     @patrons = Patrons.new
   end
 end
