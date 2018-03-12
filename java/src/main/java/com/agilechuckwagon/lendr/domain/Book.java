@@ -1,5 +1,8 @@
 package com.agilechuckwagon.lendr.domain;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,7 @@ public class Book {
     private String description;
     private String imageUrl;
 
+    @Autowired
     public Book(String bookName, String bookAuthor, String description, String imageUrl) {
         this.bookId = UUID.randomUUID();
         this.bookName = bookName;
@@ -24,7 +28,6 @@ public class Book {
         this.imageUrl = imageUrl;
     }
 
-    @Bean
     public UUID getbookId() {
         return bookId;
     }
@@ -33,7 +36,6 @@ public class Book {
         this.bookId = bookId;
     }
 
-    @Bean
     public String getbookName() {
         return bookName;
     }
@@ -42,7 +44,6 @@ public class Book {
         this.bookName = bookName;
     }
 
-    @Bean
     public String getbookAuthor() {
         return bookAuthor;
     }
@@ -51,7 +52,6 @@ public class Book {
         this.bookAuthor = bookAuthor;
     }
 
-    @Bean
     public String getDescription() {
         return description;
     }
@@ -60,7 +60,6 @@ public class Book {
         this.description = description;
     }
 
-    @Bean
     public String getImageUrl() {
         return imageUrl;
     }

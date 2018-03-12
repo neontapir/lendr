@@ -3,6 +3,7 @@ package com.agilechuckwagon.lendr.domain;
 import com.agilechuckwagon.lendr.domain.events.LibraryCreatedEvent;
 import com.agilechuckwagon.lendr.domain.events.DomainEvents;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -15,21 +16,18 @@ import java.util.UUID;
 public class Library {
     private UUID libraryId;
     private Books books;
-
-    @Autowired
     private DomainEvents domainEvents;
 
+    @Autowired
     public Library() {
         this.libraryId = UUID.randomUUID();
         this.books = new Books();
         domainEvents.raise(new LibraryCreatedEvent(this));
     }
 
-    @Bean
     public UUID getLibraryId() {
         return libraryId;
     }
-    @Bean
     public Books getBooks() {
         return books;
     }
