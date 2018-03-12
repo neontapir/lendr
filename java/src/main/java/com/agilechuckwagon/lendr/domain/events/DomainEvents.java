@@ -1,6 +1,7 @@
 package com.agilechuckwagon.lendr.domain.events;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +23,7 @@ public final class DomainEvents extends ArrayList<DomainEvent> {
             throw new IllegalStateException("Second singleton " + this + " created after " + previous);
     }
 
+    @Bean
     public static DomainEvents getInstance() {
         return INSTANCE.get();
     }

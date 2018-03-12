@@ -1,5 +1,6 @@
 package com.agilechuckwagon.lendr.domain;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class Book {
         this.imageUrl = imageUrl;
     }
 
+    @Bean
     public UUID getbookId() {
         return bookId;
     }
@@ -31,6 +33,7 @@ public class Book {
         this.bookId = bookId;
     }
 
+    @Bean
     public String getbookName() {
         return bookName;
     }
@@ -39,6 +42,7 @@ public class Book {
         this.bookName = bookName;
     }
 
+    @Bean
     public String getbookAuthor() {
         return bookAuthor;
     }
@@ -47,6 +51,7 @@ public class Book {
         this.bookAuthor = bookAuthor;
     }
 
+    @Bean
     public String getDescription() {
         return description;
     }
@@ -55,6 +60,7 @@ public class Book {
         this.description = description;
     }
 
+    @Bean
     public String getImageUrl() {
         return imageUrl;
     }

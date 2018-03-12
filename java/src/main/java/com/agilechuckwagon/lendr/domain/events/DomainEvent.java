@@ -1,5 +1,6 @@
 package com.agilechuckwagon.lendr.domain.events;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -20,12 +21,15 @@ public abstract class DomainEvent {
         this.entityId = entityId;
     }
 
+    @Bean
     public UUID getId() {
         return id;
     }
+    @Bean
     public Instant getTimestamp() {
         return timestamp;
     }
+    @Bean
     public UUID getEntityId() {
         return entityId;
     }
