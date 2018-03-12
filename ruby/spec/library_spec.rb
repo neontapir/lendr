@@ -5,6 +5,7 @@ require 'timecop'
 require 'uuid'
 require_relative '../lib/book.rb'
 require_relative '../lib/library.rb'
+require_relative '../lib/patron.rb'
 
 RSpec.describe 'the library' do
   let(:subject) { Library.create 'the library spec' }
@@ -186,6 +187,54 @@ RSpec.describe 'the library' do
 
       expect(library1.patrons[patron].standing).to eq :good
       expect(library2.patrons[patron].standing).to eq :none
+    end
+  end
+
+  context 'lending a book' do
+    library = Library.create 'lending library'
+    pierre = Patron.create 'Pierre Toulemonde'
+    left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
+    library.add left_hand_darkness
+    library_books_before = Marshal.load(Marshal.dump(library.books))
+    patron_books_before = Marshal.load(Marshal.dump(pierre.books))
+    library.register_patron pierre
+    library.lend(book: left_hand_darkness, patron: pierre)
+
+    it 'the preconditions are correct' do
+      expect(library_books_before[left_hand_darkness].owned).to eq 1
+      expect(library_books_before[left_hand_darkness].in_circulation).to eq 1
+      expect(patron_books_before[left_hand_darkness].owned).to eq 0
+      expect(patron_books_before[left_hand_darkness].in_circulation).to eq 0
+    end
+
+    it 'raise a book leant event' do
+      book_leant = EventStore.instance.any? do |e|
+        e.is_a?(LibraryLeantBookEvent) &&
+          e.book.id == left_hand_darkness.id &&
+          e.patron.id == pierre.id &&
+          e.library.id == library.id
+      end
+      expect(book_leant).to be_truthy
+    end
+
+    it 'raise a patron borrowed event' do
+      book_borrowed = EventStore.instance.any? do |e|
+        e.is_a?(PatronBorrowedBookEvent) &&
+          e.book.id == left_hand_darkness.id &&
+          e.patron.id == pierre.id &&
+          e.library.id == library.id
+      end
+      expect(book_borrowed).to be_truthy
+    end
+
+    it 'removes the book from circulation' do
+      expect(library.books[left_hand_darkness].owned).to eq 1
+      expect(library.books[left_hand_darkness].in_circulation).to eq 0
+    end
+
+    it 'becomes owned by the patron' do
+      expect(pierre.books[left_hand_darkness].owned).to eq 1
+      expect(pierre.books[left_hand_darkness].in_circulation).to eq 0
     end
   end
 end

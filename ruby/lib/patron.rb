@@ -2,6 +2,7 @@
 
 require_relative 'person.rb'
 require_relative 'events/patron_created_event.rb'
+require_relative 'events/patron_borrowed_book_event.rb'
 
 class Patron < Person
   attr_reader :books
@@ -17,6 +18,11 @@ class Patron < Person
 
   def self.get(id)
     find_by_id(id) { |event| event.patron.id }
+  end
+
+  def borrow(book:, library:)
+    @books[book] = @books[book].add_owned(1)
+    PatronBorrowedBookEvent.raise(library: library, book: book, patron: self)
   end
 
   def to_s

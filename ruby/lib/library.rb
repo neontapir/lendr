@@ -6,6 +6,7 @@ require_relative 'entity.rb'
 require_relative 'patrons.rb'
 require_relative 'events/book_copy_added_event.rb'
 require_relative 'events/book_copy_removed_event.rb'
+require_relative 'events/library_leant_book_event.rb'
 require_relative 'events/library_created_event.rb'
 require_relative 'events/patron_registered_event.rb'
 
@@ -28,6 +29,12 @@ class Library < Entity
   def add(book)
     @books[book] = @books[book].add_owned(1).add_in_circulation(1)
     BookCopyAddedEvent.raise(library: self, book: book)
+  end
+
+  def lend(book:, patron:)
+    @books[book] = @books[book].subtract_in_circulation(1)
+    LibraryLeantBookEvent.raise(library: self, book: book, patron: patron)
+    patron.borrow(book: book, library: self)
   end
 
   def remove(book)

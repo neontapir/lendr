@@ -96,6 +96,14 @@ the patron
     should return the first one instead
     should not raise a patron created event
 
+### Adding a new event
+
+The process is pretty straightforward:
+
+- create a new event (example: BookLeantEvent)
+- add a method to the orchestrating domain object (Library)
+- add a require statement to pull in the event file
+
 ## Support
 
 Please [open an issue](https://github.com/neontapir/lendr/issues/new) for support.
