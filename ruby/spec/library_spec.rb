@@ -9,9 +9,7 @@ require_relative '../lib/patron.rb'
 
 RSpec.describe 'the library' do
   let(:subject) { Library.create 'the library spec' }
-  
-  context 'a new library' do
-    
+  context 'a new library' do    
     it 'should have a valid UUID as an identifier' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
@@ -40,7 +38,7 @@ RSpec.describe 'the library' do
     end
   end
 
-  context 'adding a book to the library' do
+  context 'adding a book to the library collection' do
     it 'should raise a book copy added event' do
       book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
@@ -103,7 +101,7 @@ RSpec.describe 'the library' do
     end
   end
 
-  context 'removing a book' do
+  context 'removing a book from the library collection' do
     it 'should raise a book copy removed event' do
       subject = Library.create 'the removing books library'
       book = Book.create(title: 'The Little Prince',
@@ -195,14 +193,15 @@ RSpec.describe 'the library' do
     pierre = Patron.create 'Pierre "Happy Path" Toulemonde'
     left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
     library.add left_hand_darkness
+    library.add left_hand_darkness
     library_books_before = Marshal.load(Marshal.dump(library.books))
     patron_books_before = Marshal.load(Marshal.dump(pierre.books))
     library.register_patron pierre
     library.lend(book: left_hand_darkness, patron: pierre)
 
     it 'the preconditions are correct' do
-      expect(library_books_before[left_hand_darkness].owned).to eq 1
-      expect(library_books_before[left_hand_darkness].in_circulation).to eq 1
+      expect(library_books_before[left_hand_darkness].owned).to eq 2
+      expect(library_books_before[left_hand_darkness].in_circulation).to eq 2
       expect(patron_books_before[left_hand_darkness].borrowed).to eq 0
     end
 
@@ -226,9 +225,9 @@ RSpec.describe 'the library' do
       expect(book_borrowed).to be_truthy
     end
 
-    it 'removes the book from circulation' do
-      expect(library.books[left_hand_darkness].owned).to eq 1
-      expect(library.books[left_hand_darkness].in_circulation).to eq 0
+    it 'removes a copy of the book from circulation' do
+      expect(library.books[left_hand_darkness].owned).to eq 2
+      expect(library.books[left_hand_darkness].in_circulation).to eq 1
     end
 
     it 'becomes borrowed by the patron' do
