@@ -190,9 +190,9 @@ RSpec.describe 'the library' do
     end
   end
 
-  context 'lending a book' do
-    library = Library.create 'lending library'
-    pierre = Patron.create 'Pierre Toulemonde'
+  context 'lending an available book' do
+    library = Library.create 'happy path lending library'
+    pierre = Patron.create 'Pierre "Happy Path" Toulemonde'
     left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
     library.add left_hand_darkness
     library_books_before = Marshal.load(Marshal.dump(library.books))
@@ -231,8 +231,16 @@ RSpec.describe 'the library' do
       expect(library.books[left_hand_darkness].in_circulation).to eq 0
     end
 
-    it 'becomes owned by the patron' do
+    it 'becomes borrowed by the patron' do
       expect(pierre.books[left_hand_darkness].borrowed).to eq 1
     end
+  end
+
+  context 'will not lend an unavailable book' do
+    it 'is a pending example'
+  end
+
+  context 'will not lend a book to a patron in bad standing' do
+    it 'is a pending example'
   end
 end
