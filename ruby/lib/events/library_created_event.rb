@@ -15,6 +15,13 @@ class LibraryCreatedEvent < Event
     EventStore.instance << LibraryCreatedEvent.new(library)
   end
 
+  def self.any?(library)
+    EventStore.instance.any? do |e|
+      e.is_a?(LibraryCreatedEvent) &&
+        e.library.id == library.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@id => library.id,

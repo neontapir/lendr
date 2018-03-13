@@ -21,10 +21,7 @@ RSpec.describe 'the author' do
 
     it 'should raise a creation event' do
       expect(subject).not_to be_nil # force let eval
-      subject_created = EventStore.instance.any? do |e|
-        e.is_a?(AuthorCreatedEvent) && e.author.name == subject.name
-      end
-      expect(subject_created).to be_truthy
+      expect(AuthorCreatedEvent.any?(subject)).to be_truthy
     end
   end
 

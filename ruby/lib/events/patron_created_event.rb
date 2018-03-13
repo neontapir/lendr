@@ -15,6 +15,13 @@ class PatronCreatedEvent < Event
     EventStore.instance << PatronCreatedEvent.new(patron)
   end
 
+  def self.any?(patron:)
+    EventStore.instance.any? do |e|
+      e.is_a?(PatronCreatedEvent) &&
+        e.patron.id == patron.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@id => patron.id,

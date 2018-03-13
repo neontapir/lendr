@@ -9,7 +9,7 @@ require_relative '../lib/patron.rb'
 
 RSpec.describe 'the library' do
   let(:subject) { Library.create 'the library spec' }
-  context 'a new library' do    
+  context 'a new library' do
     it 'should have a valid UUID as an identifier' do
       expect(UUID.validate(subject.id)).to be_truthy
     end
@@ -43,13 +43,7 @@ RSpec.describe 'the library' do
       book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
       subject.add book
-
-      book_added = EventStore.instance.any? do |e|
-        e.is_a?(BookCopyAddedEvent) &&
-          e.book.id == book.id &&
-          e.library.id == subject.id
-      end
-      expect(book_added).to be_truthy
+      expect(BookCopyAddedEvent.any?(book: book, library: subject)).to be_truthy
     end
 
     it 'a new book results in 1 copy in the library' do

@@ -15,6 +15,13 @@ class AuthorCreatedEvent < Event
     EventStore.instance << AuthorCreatedEvent.new(author)
   end
 
+  def self.any?(author)
+    EventStore.instance.any? do |e|
+      e.is_a?(AuthorCreatedEvent) &&
+        e.author.id == author.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@id => author.id,

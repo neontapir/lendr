@@ -15,6 +15,13 @@ class BookCreatedEvent < Event
     EventStore.instance << BookCreatedEvent.new(book)
   end
 
+  def self.any?(book)
+    EventStore.instance.any? do |e|
+      e.is_a?(BookCreatedEvent) &&
+        e.book.id == book.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@id => book.id,

@@ -16,6 +16,14 @@ class BookCopyRemovedEvent < Event
     EventStore.instance << BookCopyRemovedEvent.new(library: library, book: book)
   end
 
+  def self.any?(library:, book:)
+    EventStore.instance.any? do |e|
+      e.is_a?(BookCopyRemovedEvent) &&
+        e.book.id == book.id &&
+        e.library.id == library.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@timestamp => timestamp,
