@@ -202,7 +202,7 @@ RSpec.describe 'the library' do
     it 'the preconditions are correct' do
       expect(library_books_before[left_hand_darkness].owned).to eq 2
       expect(library_books_before[left_hand_darkness].in_circulation).to eq 2
-      expect(patron_books_before[left_hand_darkness].borrowed).to eq 0
+      expect(patron_books_before.key?(left_hand_darkness)).to be_falsey
     end
 
     it 'raise a book leant event' do
@@ -239,9 +239,7 @@ RSpec.describe 'the library' do
 
       lhd_disposition = library.books[left_hand_darkness]
       copies_in_circulation = lhd_disposition.in_circulation
-      puts "Disposition before: #{lhd_disposition}"
       lhd_disposition.subtract_in_circulation(copies_in_circulation)
-      puts "Disposition after: #{lhd_disposition}"
       expect(lhd_disposition.in_circulation).to eq 0
       expect(library.books[left_hand_darkness].in_circulation).to eq 0
 

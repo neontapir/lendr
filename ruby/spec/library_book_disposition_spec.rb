@@ -13,6 +13,7 @@ RSpec.describe 'the library book disposition' do
     it 'adding to owned returns a new object with more books owned' do
       subject = LibraryBookDisposition.none.add_owned 3
       expect(subject).not_to be LibraryBookDisposition.none
+      expect(subject).not_to eq LibraryBookDisposition.none
       expect(subject.owned).to eq 3
       expect(subject.in_circulation).to eq 0
     end

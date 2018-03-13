@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'library_books.rb'
+require_relative 'books.rb'
 require_relative 'entity.rb'
 require_relative 'patrons.rb'
 require_relative 'events/book_copy_added_event.rb'
@@ -26,19 +26,20 @@ class Library < Entity
   end
 
   def add(book)
-    @books[book] = @books[book].add_owned(1).add_in_circulation(1)
+    @books.add(book) unless @books.key? book
+    @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
     BookCopyAddedEvent.raise(library: self, book: book)
   end
 
   def lend(book:, patron:)
-    @books[book] = @books[book].subtract_in_circulation(1)
+    @books.update(book) { |b| b.subtract_in_circulation(1) }
     LibraryLeantBookEvent.raise(library: self, book: book, patron: patron)
     patron.borrow(book: book, library: self)
   end
 
   def remove(book)
     return unless @books.key? book
-    @books[book] = @books[book].subtract_owned(1).subtract_in_circulation(1)
+    @books.update(book) { |b| b.subtract_owned(1).subtract_in_circulation(1) }
     @books.delete book if @books[book].owned < 1
     BookCopyRemovedEvent.raise(library: self, book: book)
   end
@@ -57,7 +58,7 @@ class Library < Entity
   def initialize(name: nil)
     super()
     @name = name
-    @books = LibraryBooks.new
+    @books = Books.create_library
     @patrons = Patrons.new
   end
 end

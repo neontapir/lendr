@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'patron_books.rb'
+require_relative 'books.rb'
 require_relative 'person.rb'
 require_relative 'events/patron_created_event.rb'
 require_relative 'events/patron_borrowed_book_event.rb'
@@ -22,18 +22,19 @@ class Patron < Person
   end
 
   def borrow(book:, library:)
-    @books[book] = @books[book].add_borrowed(1)
+    @books.add book unless @books.key? book
+    @books.update(book) { |b| b.add_borrowed(1) }
     PatronBorrowedBookEvent.raise(library: library, book: book, patron: self)
   end
 
   def to_s
-    "Patron { id: '#{id}' }"
+    "Patron { id: '#{id}', books: #{books} }"
   end
 
   private
 
   def initialize(name = nil)
     super(name)
-    @books = PatronBooks.new
+    @books = Books.create_patron
   end
 end
