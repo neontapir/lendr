@@ -8,6 +8,7 @@ require_relative 'events/book_copy_removed_event.rb'
 require_relative 'events/library_leant_book_event.rb'
 require_relative 'events/library_created_event.rb'
 require_relative 'events/patron_registered_event.rb'
+require_relative 'events/patron_standing_changed_event.rb'
 
 class Library < Entity
   attr_reader :books, :patrons, :name
@@ -32,6 +33,10 @@ class Library < Entity
   end
 
   def lend(book:, patron:)
+    return unless @books.key?(book) &&
+                  @books[book].in_circulation.positive? &&
+                  @patrons.key?(patron) &&
+                  may_borrow?(patron)
     @books.update(book) { |b| b.subtract_in_circulation(1) }
     LibraryLeantBookEvent.raise(library: self, book: book, patron: patron)
     patron.borrow(book: book, library: self)
@@ -45,8 +50,23 @@ class Library < Entity
   end
 
   def register_patron(patron)
-    @patrons[patron] = @patrons[patron].change_standing(:good)
+    @patrons.add(patron)
     PatronRegisteredEvent.raise(library: self, patron: patron)
+    allow_borrowing(patron)
+  end
+
+  def allow_borrowing(patron)
+    @patrons.update(patron) { |_| PatronDisposition.good }
+    PatronStandingChangedEvent.raise(library: self, patron: patron)
+  end
+
+  def may_borrow?(patron)
+    @patrons[patron] == PatronDisposition.good
+  end
+
+  def revoke_borrowing(patron)
+    @patrons.update(patron) { |_| PatronDisposition.poor }
+    PatronStandingChangedEvent.raise(library: self, patron: patron)
   end
 
   def to_s
@@ -59,6 +79,6 @@ class Library < Entity
     super()
     @name = name
     @books = Books.create_library
-    @patrons = Patrons.new
+    @patrons = Patrons.create
   end
 end

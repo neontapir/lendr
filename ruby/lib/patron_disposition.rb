@@ -3,7 +3,7 @@
 class PatronDisposition
   attr_accessor :standing
 
-  STANDINGS = %i[none good].freeze
+  STANDINGS = %i[none good poor].freeze
 
   def self.none
     PatronDisposition.new(:none)
@@ -11,6 +11,10 @@ class PatronDisposition
 
   def self.good
     PatronDisposition.new(:good)
+  end
+
+  def self.poor
+    PatronDisposition.new(:poor)
   end
 
   def initialize(standing)
