@@ -233,13 +233,30 @@ RSpec.describe 'the library' do
     it 'becomes borrowed by the patron' do
       expect(pierre.books[left_hand_darkness].borrowed).to eq 1
     end
+
+    it 'will not lend an unavailable book' do
+      pending 'need book collection to handle book disposition changes correctly first'
+
+      lhd_disposition = library.books[left_hand_darkness]
+      copies_in_circulation = lhd_disposition.in_circulation
+      puts "Disposition before: #{lhd_disposition}"
+      lhd_disposition.subtract_in_circulation(copies_in_circulation)
+      puts "Disposition after: #{lhd_disposition}"
+      expect(lhd_disposition.in_circulation).to eq 0
+      expect(library.books[left_hand_darkness].in_circulation).to eq 0
+
+      library.lend(book: left_hand_darkness, patron: pierre)
+      expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: pierre, library: library)).to be_falsey
+
+      lhd_disposition.add_in_circulation(copies_in_circulation)
+      expect(lhd_disposition.in_circulation).to eq copies_in_circulation
+    end
+
+    it 'will not lend a book to a patron in bad standing'
   end
 
-  context 'will not lend an unavailable book' do
-    it 'is a pending example'
-  end
-
-  context 'will not lend a book to a patron in bad standing' do
-    it 'is a pending example'
+  context 'returning a borrowed book' do
+    it 'raise a patron returned book event'
+    it 'raise a library accepted return book event'
   end
 end

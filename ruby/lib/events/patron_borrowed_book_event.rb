@@ -17,6 +17,15 @@ class PatronBorrowedBookEvent < Event
     EventStore.instance << PatronBorrowedBookEvent.new(book: book, library: library, patron: patron)
   end
 
+  def self.any?(book:, library:, patron:)
+    EventStore.instance.any? do |e|
+      e.is_a?(PatronBorrowedBookEvent) &&
+        e.book.id == book.id &&
+        e.patron.id == patron.id &&
+        e.library.id == library.id
+    end
+  end
+
   def apply_to(projection)
     update(projection,
            :@id => id,

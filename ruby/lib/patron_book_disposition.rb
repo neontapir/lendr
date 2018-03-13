@@ -12,7 +12,7 @@ class PatronBookDisposition
   end
 
   def add_borrowed(quantity)
-    PatronBookDisposition.new(borrowed: borrowed + quantity)
+    PatronBookDisposition.new(borrowed: [borrowed + quantity, 0].max)
   end
 
   def subtract_borrowed(quantity)
@@ -28,5 +28,9 @@ class PatronBookDisposition
 
   def hash
     borrowed.hash
+  end
+
+  def to_s
+    "PatronBookDisposition: { borrowed: #{borrowed} }"
   end
 end
