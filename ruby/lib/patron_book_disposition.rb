@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PatronBookDisposition
-  attr_accessor :borrowed
+  attr_reader :borrowed
 
   def self.none
     PatronBookDisposition.new(borrowed: 0)

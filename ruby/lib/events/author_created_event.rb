@@ -23,9 +23,10 @@ class AuthorCreatedEvent < Event
   end
 
   def apply_to(projection)
-    update(projection,
-           :@id => author.id,
-           :@timestamp => author.timestamp,
-           :@name => author.name)
+    projection.is_a?(Author) &&
+      update(projection,
+             :@id => author.id,
+             :@timestamp => author.timestamp,
+             :@name => author.name)
   end
 end

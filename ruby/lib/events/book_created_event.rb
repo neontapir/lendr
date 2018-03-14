@@ -23,10 +23,11 @@ class BookCreatedEvent < Event
   end
 
   def apply_to(projection)
-    update(projection,
-           :@id => book.id,
-           :@timestamp => book.timestamp,
-           :@title => book.title,
-           :@author => book.author)
+    projection.is_a?(Book) &&
+      update(projection,
+             :@id => book.id,
+             :@timestamp => book.timestamp,
+             :@title => book.title,
+             :@author => book.author)
   end
 end

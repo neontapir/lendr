@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
+require_relative '../lib/author.rb'
+require_relative '../lib/book.rb'
 require_relative '../lib/library.rb'
 require_relative '../lib/library_book_disposition.rb'
+require_relative '../lib/patron.rb'
 
 RSpec.describe 'the event store' do
   context 'getting an author by id' do
@@ -85,6 +88,37 @@ RSpec.describe 'the event store' do
 
     it 'returns nil if the patron does not exist' do
       expect(Patron.get('xyzzy')).to be_nil
+    end
+  end
+
+  context 'events that impact multiple domain objects' do
+    library = Library.create 'event store testing lending library'
+    jan = Patron.create 'Jan Alleman'
+    name_of_the_wind = Book.create(title: 'The Name of the Wind', author: 'Patrick Rothfuss')
+    library.add name_of_the_wind
+    library.register_patron jan
+    library.lend(book: name_of_the_wind, patron: jan)
+
+    it 'captures updates to the library' do
+      stored_library = Library.get(library.id)
+      expect(stored_library.books).to eq library.books
+      expect(stored_library.patrons).to eq library.patrons
+      expect(stored_library).to eq library
+    end
+
+    it 'captures updates to the patron' do
+      stored_patron = Patron.get(jan.id)
+      expect(stored_patron).to eq jan
+    end
+
+    it 'captures updates to the book' do
+      stored_book = Book.get(name_of_the_wind.id)
+      expect(stored_book).to eq name_of_the_wind
+    end
+
+    it 'captures updates to the author' do
+      stored_author = Author.get(name_of_the_wind.author.id)
+      expect(stored_author.name).to eq 'Patrick Rothfuss'
     end
   end
 end

@@ -25,8 +25,9 @@ class BookCopyAddedEvent < Event
   end
 
   def apply_to(projection)
-    update(projection,
-           :@timestamp => timestamp,
-           :@books => library.books)
+    projection.is_a?(Library) &&
+      update(projection,
+             :@timestamp => timestamp,
+             :@books => library.books)
   end
 end

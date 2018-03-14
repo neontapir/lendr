@@ -3,7 +3,7 @@
 require 'observer'
 
 class LibraryBookDisposition
-  attr_accessor :owned, :in_circulation
+  attr_reader :owned, :in_circulation
 
   def self.none
     LibraryBookDisposition.new(owned: 0, in_circulation: 0).freeze

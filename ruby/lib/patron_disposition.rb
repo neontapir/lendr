@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PatronDisposition
-  attr_accessor :standing
+  attr_reader :standing
 
   STANDINGS = %i[none good poor].freeze
 

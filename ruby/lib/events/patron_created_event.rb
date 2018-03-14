@@ -23,10 +23,11 @@ class PatronCreatedEvent < Event
   end
 
   def apply_to(projection)
-    update(projection,
-           :@id => patron.id,
-           :@timestamp => patron.timestamp,
-           :@name => patron.name,
-           :@books => patron.books)
+    projection.is_a?(Patron) &&
+      update(projection,
+             :@id => patron.id,
+             :@timestamp => patron.timestamp,
+             :@name => patron.name,
+             :@books => patron.books)
   end
 end

@@ -25,8 +25,9 @@ class PatronStandingChangedEvent < Event
   end
 
   def apply_to(projection)
-    update(projection,
-           :@timestamp => timestamp,
-           :@patrons => library.patrons)
+    projection.is_a?(Library) &&
+      update(projection,
+             :@timestamp => timestamp,
+             :@patrons => library.patrons)
   end
 end

@@ -13,15 +13,16 @@ RSpec.describe 'the patrons collection' do
   end
 
   it "updating a patron's standing directly does not update the patrons collection" do
-    pending 'this should work the same as Books but does not, find out why'
-    
+    # pending 'this should work the same as Books but does not, find out why'
+
     patrons = Patrons.create
     john = Patron.new(name: 'John Smith')
+    patrons.add(john)
 
-    patrons.add(john).update(john) { |_| PatronDisposition.poor }
-    expect(patrons[john]).to eq PatronDisposition.poor
+    patrons.update(john) { |_| PatronDisposition.poor }
+    expect(patrons[john].standing).to eq :poor
 
-    patrons[john].standing = :good
-    expect(patrons[john].standing).to eq PatronDisposition.poor
+    patrons[john].change_standing :good
+    expect(patrons[john].standing).to eq :poor
   end
 end
