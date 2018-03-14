@@ -178,7 +178,7 @@ RSpec.describe 'the library' do
       library1.register_patron patron
 
       expect(library1.patrons[patron].standing).to eq :good
-      expect(library2.patrons.key?(patron)).to be_falsey
+      expect(library2.patron?(patron)).to be_falsey
     end
   end
 
@@ -188,25 +188,19 @@ RSpec.describe 'the library' do
     left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
     library.add left_hand_darkness
     library.add left_hand_darkness
-    library_books_before = Marshal.load(Marshal.dump(library.books))
-    patron_books_before = Marshal.load(Marshal.dump(pierre.books))
+    library_before = Marshal.load(Marshal.dump(library))
+    patron_before = Marshal.load(Marshal.dump(pierre))
     library.register_patron pierre
     library.lend(book: left_hand_darkness, patron: pierre)
 
     it 'the preconditions are correct' do
-      expect(library_books_before[left_hand_darkness].owned).to eq 2
-      expect(library_books_before[left_hand_darkness].in_circulation).to eq 2
-      expect(patron_books_before.key?(left_hand_darkness)).to be_falsey
+      expect(library_before.books[left_hand_darkness].owned).to eq 2
+      expect(library_before.books[left_hand_darkness].in_circulation).to eq 2
+      expect(patron_before.borrowing?(left_hand_darkness)).to be_falsey
     end
 
     it 'raise a book leant event' do
-      book_leant = EventStore.instance.any? do |e|
-        e.is_a?(LibraryLeantBookEvent) &&
-          e.book.id == left_hand_darkness.id &&
-          e.patron.id == pierre.id &&
-          e.library.id == library.id
-      end
-      expect(book_leant).to be_truthy
+      expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: pierre, library: library)).to be_truthy
     end
 
     it 'raise a patron borrowed event' do
@@ -245,7 +239,7 @@ RSpec.describe 'the library' do
 
     it 'will not lend a book the library does not own' do
       neuromancer = Book.new(title: 'Neuromancer', author: 'William Gibson')
-      expect(library.books.key?(neuromancer)).to be_falsey
+      expect(library.owns?(neuromancer)).to be_falsey
 
       library.lend(book: neuromancer, patron: jacque)
       expect(LibraryLeantBookEvent.any?(book: neuromancer, patron: jacque, library: library)).to be_falsey
@@ -256,7 +250,7 @@ RSpec.describe 'the library' do
       copies_in_circulation = library.books[left_hand_darkness].in_circulation
       expect(copies_in_circulation.positive?).to be_truthy
       library.books.update(left_hand_darkness) { |b| b.subtract_in_circulation(copies_in_circulation) }
-      expect(library.books[left_hand_darkness].in_circulation).to eq 0
+      expect(library.in_circulation?(left_hand_darkness)).to be_falsey
 
       library.lend(book: left_hand_darkness, patron: jacque)
       expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: jacque, library: library)).to be_falsey
@@ -275,10 +269,5 @@ RSpec.describe 'the library' do
       expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: alice, library: library)).to be_falsey
       expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: alice, library: library)).to be_falsey
     end
-  end
-
-  context 'returning a borrowed book' do
-    it 'raise a patron returned book event'
-    it 'raise a library accepted return book event'
   end
 end

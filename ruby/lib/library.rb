@@ -7,6 +7,7 @@ require_relative 'events/book_copy_added_event.rb'
 require_relative 'events/book_copy_removed_event.rb'
 require_relative 'events/library_leant_book_event.rb'
 require_relative 'events/library_created_event.rb'
+require_relative 'events/library_book_return_accepted_event.rb'
 require_relative 'events/patron_registered_event.rb'
 require_relative 'events/patron_standing_changed_event.rb'
 
@@ -33,17 +34,22 @@ class Library < Entity
   end
 
   def lend(book:, patron:)
-    return unless @books.key?(book) &&
-                  @books[book].in_circulation.positive? &&
-                  @patrons.key?(patron) &&
+    return unless owns?(book) &&
+                  in_circulation?(book) &&
+                  patron?(patron) &&
                   may_borrow?(patron)
     @books.update(book) { |b| b.subtract_in_circulation(1) }
     LibraryLeantBookEvent.raise(library: self, book: book, patron: patron)
     patron.borrow(book: book, library: self)
   end
 
+  def return(book:, patron:)
+    @books.update(book) { |b| b.add_in_circulation(1) }
+    LibraryBookReturnAcceptedEvent.raise(library: self, book: book, patron: patron)
+  end
+
   def remove(book)
-    return unless @books.key? book
+    return unless owns?(book)
     @books.update(book) { |b| b.subtract_owned(1).subtract_in_circulation(1) }
     @books.delete book if @books[book].owned < 1
     BookCopyRemovedEvent.raise(library: self, book: book)
@@ -60,13 +66,25 @@ class Library < Entity
     PatronStandingChangedEvent.raise(library: self, patron: patron)
   end
 
-  def may_borrow?(patron)
-    @patrons[patron] == PatronDisposition.good
-  end
-
   def revoke_borrowing(patron)
     @patrons.update(patron) { |_| PatronDisposition.poor }
     PatronStandingChangedEvent.raise(library: self, patron: patron)
+  end
+
+  def owns?(book)
+    @books.key?(book)
+  end
+
+  def in_circulation?(book)
+    owns?(book) && @books[book].in_circulation.positive?
+  end
+
+  def patron?(patron)
+    @patrons.key?(patron)
+  end
+
+  def may_borrow?(patron)
+    @patrons[patron] == PatronDisposition.good
   end
 
   def to_s

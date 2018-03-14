@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 require 'uuid'
+require_relative '../lib/book.rb'
+require_relative '../lib/library.rb'
 require_relative '../lib/patron.rb'
 
 RSpec.describe 'the patron' do
@@ -47,6 +49,61 @@ RSpec.describe 'the patron' do
         e.is_a?(PatronCreatedEvent) && e.patron == first
       end
       expect(patron_created_events.size).to eq 1
+    end
+  end
+
+  context 'returning a borrowed book' do
+    library = Library.create 'happy path returning library'
+    fulan = Patron.create 'Fulan al-Fulani'
+    library.register_patron fulan
+    utopia = Book.create(title: 'Utopia', author: 'Ahmed Tawfiq')
+    library.add utopia
+    library.lend(book: utopia, patron: fulan)
+    library_books_before = Marshal.load(Marshal.dump(library.books))
+    patron_books_before = Marshal.load(Marshal.dump(fulan.books))
+    fulan.return(book: utopia, library: library)
+
+    it 'the preconditions are correct' do
+      expect(library_books_before[utopia].owned).to eq 1
+      expect(library_books_before[utopia].in_circulation).to eq 0
+      expect(patron_books_before[utopia].borrowed).to eq 1
+    end
+
+    it 'updates the library' do
+      expect(library.books[utopia].owned).to eq 1
+      expect(library.books[utopia].in_circulation).to eq 1
+    end
+
+    it 'updates the patron' do
+      expect(fulan.borrowing?(utopia)).to be_falsey
+    end
+
+    it 'raise a patron returned book event' do
+      expect(PatronReturnedBookEvent.any?(book: utopia, patron: fulan, library: library)).to be_truthy
+    end
+
+    it 'raise a library accepted return book event' do
+      expect(LibraryBookReturnAcceptedEvent.any?(book: utopia, patron: fulan, library: library)).to be_truthy
+    end
+  end
+
+  context 'trying to return a book' do
+    lending_library = Library.create 'sad path library loaning book to be returned'
+    returning_library = Library.create 'sad path library patron tries to return book to'
+    mujo = Patron.create 'Mujo Mujić'
+    lending_library.register_patron mujo
+    fourth_circle = Book.create(title: 'The Fourth Circle', author: 'Zoran Živković')
+    lending_library.add fourth_circle
+    lending_library.lend(book: fourth_circle, patron: mujo)
+    
+    it 'will not return a book to the wrong library' do
+      expect(returning_library.owns?(fourth_circle)).to be_falsey
+      
+      mujo.return(book: fourth_circle, library: returning_library)
+
+      expect(lending_library.books[fourth_circle].owned).to eq 1
+      expect(lending_library.books[fourth_circle].in_circulation).to eq 0
+      expect(mujo.books[fourth_circle].borrowed).to eq 1
     end
   end
 end
