@@ -10,7 +10,6 @@ GEM
     rack (2.0.4)
     rack-protection (2.0.1)
       rack
-    ruby_deep_clone (0.8.0)
     sinatra (2.0.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -34,7 +33,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  ruby_deep_clone
   solargraph
   timecop
   uuid

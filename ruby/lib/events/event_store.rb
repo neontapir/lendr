@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'deep_clone' # performs better than Marshal.load( Marshal.dump(event) )
 require 'forwardable'
 require 'singleton'
 require_relative 'event.rb'
@@ -18,7 +17,7 @@ class EventStore
 
   def self.store(event)
     raise unless event.is_a?(Event)
-    instance << DeepClone.clone(event)
+    instance << Marshal.load( Marshal.dump(event) )
   end
 
   def_delegators :@list, :empty?, :<<, :size, :map, :any?, 
