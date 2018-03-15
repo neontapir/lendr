@@ -11,13 +11,6 @@ class AuthorCreatedEvent < Event
     @author = author
   end
 
-  def self.any?(author)
-    EventStore.instance.any? do |e|
-      e.is_a?(AuthorCreatedEvent) &&
-        e.author.id == author.id
-    end
-  end
-
   def apply_to(projection)
     projection.is_a?(Author) &&
       update(projection,

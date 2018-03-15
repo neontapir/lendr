@@ -12,14 +12,6 @@ class PatronStandingChangedEvent < Event
     @patron = patron
   end
 
-  def self.any?(library:, patron:)
-    EventStore.instance.any? do |e|
-      e.is_a?(PatronStandingChangedEvent) &&
-        e.patron.id == patron.id &&
-        e.library.id == library.id
-    end
-  end
-
   def apply_to(projection)
     projection.is_a?(Library) &&
       update(projection,

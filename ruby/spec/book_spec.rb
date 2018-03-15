@@ -21,7 +21,7 @@ RSpec.describe 'the book' do
 
     it 'should raise a book creation event' do
       expect(subject).not_to be_nil # force let eval
-      expect(BookCreatedEvent.any?(subject)).to be_truthy
+      expect(BookCreatedEvent.any?(book: subject)).to be_truthy
     end
   end
 

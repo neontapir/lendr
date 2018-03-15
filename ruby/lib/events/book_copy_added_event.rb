@@ -12,14 +12,6 @@ class BookCopyAddedEvent < Event
     @library = library
   end
 
-  def self.any?(book:, library:)
-    EventStore.instance.any? do |e|
-      e.is_a?(BookCopyAddedEvent) &&
-        e.book.id == book.id &&
-        e.library.id == library.id
-    end
-  end
-
   def apply_to(projection)
     return unless projection.is_a?(Library)
     update(projection,
