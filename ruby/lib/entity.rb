@@ -6,26 +6,6 @@ require_relative 'entity.rb'
 class Entity
   attr_reader :id, :timestamp
 
-  def initialize
-    @id = SecureRandom.uuid
-    update_timestamp
-  end
-
-  def update_timestamp(new_time = Time.now)
-    @timestamp = new_time
-  end
-
-  def ==(other)
-    self.class == other.class &&
-      id == other.id
-  end
-
-  alias_method :eql?, :==
-
-  def hash
-    id.hash
-  end
-
   def self.find_by_attributes(time = Time.now, &entity_lookup)
     events = EventStore.instance.find_all do |event|
       begin
@@ -38,6 +18,10 @@ class Entity
     return nil if events.empty?
 
     project(events)
+  end
+
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.send(name.downcase).id }
   end
 
   def self.find_by_id(id, time = Time.now, &event_id_lookup)
@@ -62,8 +46,24 @@ class Entity
     projection
   end
 
-  def self.get(id, time = Time.now)
-    find_by_id(id, time) { |event| event.send(name.downcase).id }
+  def initialize
+    @id = SecureRandom.uuid
+    update_timestamp
+  end
+
+  def update_timestamp(new_time = Time.now)
+    @timestamp = new_time
+  end
+
+  def ==(other)
+    self.class == other.class &&
+      id == other.id
+  end
+
+  alias_method :eql?, :==
+  
+  def hash
+    id.hash
   end
 
   def to_s
