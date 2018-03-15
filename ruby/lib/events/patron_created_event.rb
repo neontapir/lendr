@@ -6,18 +6,14 @@ require_relative 'event_store.rb'
 class PatronCreatedEvent < Event
   attr_reader :patron
 
-  def initialize(patron)
+  def initialize(patron:)
     super()
     @patron = patron
   end
 
-  def self.raise(patron)
-    event = new(patron)
-    [patron, patron.books].each do |entity|
-      entity.update_timestamp event.timestamp
-    end
-    EventStore.store event
-  end
+  # def self.raise(patron:)
+  #   super(patron: patron)
+  # end
 
   def self.any?(patron:)
     EventStore.instance.any? do |e|

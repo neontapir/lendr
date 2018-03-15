@@ -9,6 +9,12 @@ require_relative '../lib/library_book_disposition.rb'
 require_relative '../lib/patron.rb'
 
 RSpec.describe 'the event store' do
+  context 'raising an event' do
+    it 'checks the parameters', focus: true do
+      expect { AuthorCreatedEvent.dispatch(yo: 'hello') }.to raise_error
+    end
+  end
+
   context 'getting the latest version of' do
     context 'an author' do
       let(:author) do

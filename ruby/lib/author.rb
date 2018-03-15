@@ -8,7 +8,7 @@ class Author < Person
     author = find_by_attributes { |event| name == event.author.name }
     unless author
       author = Author.new(name)
-      AuthorCreatedEvent.raise author
+      AuthorCreatedEvent.dispatch author: author
     end
     author
   end

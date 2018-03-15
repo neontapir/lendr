@@ -18,7 +18,7 @@ class Library < Entity
     library = find_by_attributes { |event| name == event.library.name }
     unless library
       library = Library.new(name: name)
-      LibraryCreatedEvent.raise library
+      LibraryCreatedEvent.dispatch library: library
     end
     library
   end
@@ -30,7 +30,7 @@ class Library < Entity
   def add(book)
     @books.add(book) unless owns?(book)
     @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
-    BookCopyAddedEvent.raise(library: self, book: book)
+    BookCopyAddedEvent.dispatch(library: self, book: book)
   end
 
   def lend(book:, patron:)
@@ -39,36 +39,36 @@ class Library < Entity
                   patron?(patron) &&
                   may_borrow?(patron)
     @books.update(book) { |b| b.subtract_in_circulation(1) }
-    LibraryLeantBookEvent.raise(library: self, book: book, patron: patron)
+    LibraryLeantBookEvent.dispatch(library: self, book: book, patron: patron)
     patron.borrow(book: book, library: self)
   end
 
   def return(book:, patron:)
     @books.update(book) { |b| b.add_in_circulation(1) }
-    LibraryBookReturnAcceptedEvent.raise(library: self, book: book, patron: patron)
+    LibraryBookReturnAcceptedEvent.dispatch(library: self, book: book, patron: patron)
   end
 
   def remove(book)
     return unless owns?(book)
     @books.update(book) { |b| b.subtract_owned(1).subtract_in_circulation(1) }
     @books.delete book unless owns?(book)
-    BookCopyRemovedEvent.raise(library: self, book: book)
+    BookCopyRemovedEvent.dispatch(library: self, book: book)
   end
 
   def register_patron(patron)
     @patrons.add(patron)
-    PatronRegisteredEvent.raise(library: self, patron: patron)
+    PatronRegisteredEvent.dispatch(library: self, patron: patron)
     allow_borrowing(patron)
   end
 
   def allow_borrowing(patron)
     @patrons.update(patron) { |_| PatronDisposition.good }
-    PatronStandingChangedEvent.raise(library: self, patron: patron)
+    PatronStandingChangedEvent.dispatch(library: self, patron: patron)
   end
 
   def revoke_borrowing(patron)
     @patrons.update(patron) { |_| PatronDisposition.poor }
-    PatronStandingChangedEvent.raise(library: self, patron: patron)
+    PatronStandingChangedEvent.dispatch(library: self, patron: patron)
   end
 
   def owns?(book)

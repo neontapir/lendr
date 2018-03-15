@@ -6,18 +6,14 @@ require_relative 'event_store.rb'
 class LibraryCreatedEvent < Event
   attr_reader :library
 
-  def initialize(library)
+  def initialize(library:)
     super()
     @library = library
   end
 
-  def self.raise(library)
-    event = new(library)
-    [library, library.books, library.patrons].each do |entity|
-      entity.update_timestamp event.timestamp
-    end
-    EventStore.store event
-  end
+  # def self.raise(library:)
+  #   super(library: library)
+  # end
 
   def self.any?(library)
     EventStore.instance.any? do |e|

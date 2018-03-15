@@ -11,7 +11,7 @@ class Book < Entity
     book = find_by_attributes { |event| title == event.book.title && author == event.book.author.name }
     unless book
       book = Book.new(title: title, author: Author.create(author))
-      BookCreatedEvent.raise book
+      BookCreatedEvent.dispatch book: book
     end
     book
   end

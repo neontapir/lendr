@@ -13,7 +13,7 @@ class Patron < Person
     patron = find_by_attributes { |event| name == event.patron.name }
     unless patron
       patron = Patron.new(name)
-      PatronCreatedEvent.raise patron
+      PatronCreatedEvent.dispatch patron: patron
     end
     patron
   end
@@ -25,14 +25,14 @@ class Patron < Person
   def borrow(book:, library:)
     @books.add book unless borrowing?(book)
     @books.update(book) { |b| b.add_borrowed(1) }
-    PatronBorrowedBookEvent.raise(library: library, book: book, patron: self)
+    PatronBorrowedBookEvent.dispatch(library: library, book: book, patron: self)
   end
 
   def return(book:, library:)
     return unless patron_of?(library)
     @books.update(book) { |b| b.subtract_borrowed(1) }
     @books.delete book unless @books[book].borrowed.positive?
-    PatronReturnedBookEvent.raise(library: library, book: book, patron: self)
+    PatronReturnedBookEvent.dispatch(library: library, book: book, patron: self)
     library.return(book: book, patron: self)
   end
 

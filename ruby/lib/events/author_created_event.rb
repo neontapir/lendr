@@ -6,16 +6,14 @@ require_relative 'event_store.rb'
 class AuthorCreatedEvent < Event
   attr_reader :author
 
-  def initialize(author)
+  def initialize(author:)
     super()
     @author = author
   end
 
-  def self.raise(author)
-    event = new(author)
-    author.update_timestamp event.timestamp
-    EventStore.store event
-  end
+  # def self.raise(author:)
+  #   super(author: author)
+  # end
 
   def self.any?(author)
     EventStore.instance.any? do |e|
