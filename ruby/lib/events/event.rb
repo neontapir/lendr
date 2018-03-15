@@ -5,10 +5,6 @@ require_relative '../entity.rb'
 class Event < Entity
   attr_reader :type
 
-  def initialize
-    super
-  end
-
   def self.dispatch(**entities)
     unless entities.is_a?(Hash) &&
            entities.keys.sort == instance_method(:initialize).parameters.map(&:last).sort
@@ -26,12 +22,5 @@ class Event < Entity
     transform.each do |key, value|
       projection.instance_variable_set key, value
     end
-  end
-
-  def to_s
-    variables = instance_variables.map do |v|
-      "#{v}: #{instance_variable_get(v.to_s)}"
-    end.join(', ')
-    "{ #{self.class}: #{variables} }"
   end
 end

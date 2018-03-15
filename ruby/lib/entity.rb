@@ -63,9 +63,10 @@ class Entity
   end
 
   def to_s
-    variables = instance_variables.map do |v|
+    variables = instance_variables - [:@id, :@timestamp]
+    properties = variables.map do |v|
       "#{v}: #{instance_variable_get(v.to_s)}"
     end.join(', ')
-    "{ #{self.class}: #{variables} }"
+    "{ #{self.class}: #{properties} }"
   end
 end
