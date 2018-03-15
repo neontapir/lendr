@@ -7,12 +7,9 @@ require_relative 'event.rb'
 class EventStore
   include Singleton
   extend Forwardable
+  
   def initialize(list = [])
     @list = list
-  end
-
-  def collection
-    @list.dup
   end
 
   def self.store(event)
@@ -20,6 +17,6 @@ class EventStore
     instance << Marshal.load( Marshal.dump(event) )
   end
 
-  def_delegators :@list, :empty?, :<<, :size, :map, :any?, 
+  def_delegators :@list, :empty?, :<<, :size, :map, :any?,
                  :find, :find_all, :to_s
 end
