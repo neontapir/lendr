@@ -16,10 +16,6 @@ class Book < Entity
     book
   end
 
-  def self.get(id, time = Time.now)
-    find_by_id(id, time) { |event| event.book.id }
-  end
-
   private
 
   def initialize(title: nil, author: nil)

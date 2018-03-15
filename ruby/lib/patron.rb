@@ -18,10 +18,6 @@ class Patron < Person
     patron
   end
 
-  def self.get(id, time = Time.now)
-    find_by_id(id, time) { |event| event.patron.id }
-  end
-
   def borrow(book:, library:)
     @books.add book unless borrowing?(book)
     @books.update(book) { |b| b.add_borrowed(1) }

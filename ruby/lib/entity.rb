@@ -62,8 +62,12 @@ class Entity
     projection
   end
 
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.send(name.downcase).id }
+  end
+
   def to_s
-    variables = instance_variables - [:@id, :@timestamp]
+    variables = instance_variables - %I[@id @timestamp]
     properties = variables.map do |v|
       "#{v}: #{instance_variable_get(v.to_s)}"
     end.join(', ')

@@ -23,10 +23,6 @@ class Library < Entity
     library
   end
 
-  def self.get(id, time = Time.now)
-    find_by_id(id, time) { |event| event.library.id }
-  end
-
   def add(book)
     @books.add(book) unless owns?(book)
     @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
