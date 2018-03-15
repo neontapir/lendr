@@ -12,11 +12,6 @@ class PatronRegisteredEvent < Event
     @patron = patron
   end
 
-  # # not strictly necessary
-  # def self.raise(library:, patron:)
-  #   super(library: library, patron: patron)
-  # end
-
   def self.any?(library:, patron:)
     EventStore.instance.any? do |e|
       e.is_a?(PatronRegisteredEvent) &&

@@ -11,10 +11,6 @@ class LibraryCreatedEvent < Event
     @library = library
   end
 
-  # def self.raise(library:)
-  #   super(library: library)
-  # end
-
   def self.any?(library)
     EventStore.instance.any? do |e|
       e.is_a?(LibraryCreatedEvent) &&

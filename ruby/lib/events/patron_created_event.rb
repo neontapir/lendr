@@ -11,10 +11,6 @@ class PatronCreatedEvent < Event
     @patron = patron
   end
 
-  # def self.raise(patron:)
-  #   super(patron: patron)
-  # end
-
   def self.any?(patron:)
     EventStore.instance.any? do |e|
       e.is_a?(PatronCreatedEvent) &&

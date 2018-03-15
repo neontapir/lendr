@@ -13,11 +13,6 @@ class PatronBorrowedBookEvent < Event
     @patron = patron
   end
 
-  # # not strictly necessary
-  # def self.raise(library:, book:, patron:)
-  #   super(library: library, book: book, patron: patron)
-  # end
-
   def self.any?(book:, library:, patron:)
     EventStore.instance.any? do |e|
       e.is_a?(PatronBorrowedBookEvent) &&

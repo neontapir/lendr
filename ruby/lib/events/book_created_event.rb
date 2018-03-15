@@ -11,10 +11,6 @@ class BookCreatedEvent < Event
     @book = book
   end
 
-  # def self.raise(book:)
-  #   super(book: book)
-  # end
-
   def self.any?(book)
     EventStore.instance.any? do |e|
       e.is_a?(BookCreatedEvent) &&

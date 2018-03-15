@@ -4,20 +4,15 @@ require_relative 'event.rb'
 require_relative 'event_store.rb'
 
 class BookCopyRemovedEvent < Event
-  attr_reader :library, :book
+  attr_reader :book, :library
 
-  def initialize(library:, book:)
+  def initialize(book:, library:)
     super()
     @book = book
     @library = library
   end
 
-  # # not strictly necessary
-  # def self.raise(library:, book:)
-  #   super(library: library, book: book)
-  # end
-
-  def self.any?(library:, book:)
+  def self.any?(book:, library:)
     EventStore.instance.any? do |e|
       e.is_a?(BookCopyRemovedEvent) &&
         e.book.id == book.id &&

@@ -11,10 +11,6 @@ class AuthorCreatedEvent < Event
     @author = author
   end
 
-  # def self.raise(author:)
-  #   super(author: author)
-  # end
-
   def self.any?(author)
     EventStore.instance.any? do |e|
       e.is_a?(AuthorCreatedEvent) &&

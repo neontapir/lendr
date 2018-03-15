@@ -6,7 +6,7 @@ require_relative '../lib/events/event_store.rb'
 RSpec.describe 'the event' do
   context 'raising an event' do
     it 'checks the parameters' do
-      expect { AuthorCreatedEvent.dispatch(invalid: 'parameter') }.to raise_error
+      expect { AuthorCreatedEvent.dispatch(invalid: 'parameter') }.to raise_error RuntimeError
     end
   end
 end
