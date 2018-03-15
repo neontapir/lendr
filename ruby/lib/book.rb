@@ -16,12 +16,8 @@ class Book < Entity
     book
   end
 
-  def self.get(id)
-    find_by_id(id) { |event| event.book.id }
-  end
-
-  def to_s
-    "Book { id: '#{id}' }"
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.book.id }
   end
 
   private

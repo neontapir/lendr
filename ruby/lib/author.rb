@@ -13,12 +13,8 @@ class Author < Person
     author
   end
 
-  def self.get(id)
-    find_by_id(id) { |event| event.author.id }
-  end
-
-  def to_s
-    "Author { id: '#{id}' }"
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.author.id }
   end
 
   private

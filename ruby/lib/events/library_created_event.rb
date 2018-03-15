@@ -12,7 +12,11 @@ class LibraryCreatedEvent < Event
   end
 
   def self.raise(library)
-    EventStore.instance << LibraryCreatedEvent.new(library)
+    event = new(library)
+    [library, library.books, library.patrons].each do |entity|
+      entity.update_timestamp event.timestamp
+    end
+    EventStore.store event
   end
 
   def self.any?(library)

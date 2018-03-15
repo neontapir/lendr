@@ -23,12 +23,12 @@ class Library < Entity
     library
   end
 
-  def self.get(id)
-    find_by_id(id) { |event| event.library.id }
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.library.id }
   end
 
   def add(book)
-    @books.add(book) unless @books.key? book
+    @books.add(book) unless owns?(book)
     @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
     BookCopyAddedEvent.raise(library: self, book: book)
   end
@@ -51,7 +51,7 @@ class Library < Entity
   def remove(book)
     return unless owns?(book)
     @books.update(book) { |b| b.subtract_owned(1).subtract_in_circulation(1) }
-    @books.delete book if @books[book].owned < 1
+    @books.delete book unless owns?(book)
     BookCopyRemovedEvent.raise(library: self, book: book)
   end
 
@@ -72,7 +72,7 @@ class Library < Entity
   end
 
   def owns?(book)
-    @books.key?(book)
+    @books.key?(book) && @books[book].owned.positive?
   end
 
   def in_circulation?(book)
@@ -87,16 +87,12 @@ class Library < Entity
     @patrons[patron] == PatronDisposition.good
   end
 
-  def to_s
-    "Library { id: '#{id}', name: '#{name}' }"
-  end
-
   private
 
-  def initialize(name: nil)
+  def initialize(name: nil, books: Books.create_library, patrons: Patrons.create)
     super()
     @name = name
-    @books = Books.create_library
-    @patrons = Patrons.create
+    @books = books
+    @patrons = patrons
   end
 end

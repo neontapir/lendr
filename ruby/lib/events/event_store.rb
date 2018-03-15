@@ -10,6 +10,14 @@ class EventStore
     @list = list
   end
 
-  def_delegators :@list, :empty?, :<<, :size, :map, :any?, :find, :find_all,
-                 :to_s
+  def collection
+    @list.dup
+  end
+
+  def self.store(event)
+    instance << Marshal.load( Marshal.dump(event) )
+  end
+
+  def_delegators :@list, :empty?, :<<, :size, :map, :any?, 
+                 :find, :find_all, :to_s
 end

@@ -13,7 +13,11 @@ class BookCopyRemovedEvent < Event
   end
 
   def self.raise(library:, book:)
-    EventStore.instance << BookCopyRemovedEvent.new(library: library, book: book)
+    event = new(library: library, book: book)
+    [book, library, library.books].each do |entity|
+      entity.update_timestamp event.timestamp
+    end
+    EventStore.store event
   end
 
   def self.any?(library:, book:)

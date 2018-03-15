@@ -16,6 +16,10 @@ class Books < Entity
     Books.new PatronBookDisposition.none
   end
 
+  def collection
+    @list.dup
+  end
+
   def [](book)
     @list[book]
   end
@@ -35,9 +39,9 @@ class Books < Entity
 
   private
 
-  def initialize(default_value)
+  def initialize(default_value, list = {})
     super()
     @default_value = default_value
-    @list = {}
+    @list = list
   end
 end

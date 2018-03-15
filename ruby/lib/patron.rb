@@ -18,8 +18,8 @@ class Patron < Person
     patron
   end
 
-  def self.get(id)
-    find_by_id(id) { |event| event.patron.id }
+  def self.get(id, time = Time.now)
+    find_by_id(id, time) { |event| event.patron.id }
   end
 
   def borrow(book:, library:)
@@ -42,10 +42,6 @@ class Patron < Person
 
   def patron_of?(library)
     library.patron?(self)
-  end
-
-  def to_s
-    "Patron { id: '#{id}', books: #{books} }"
   end
 
   private

@@ -183,91 +183,96 @@ RSpec.describe 'the library' do
   end
 
   context 'lending an available book' do
-    library = Library.create 'happy path lending library'
-    pierre = Patron.create 'Pierre "Happy Path" Toulemonde'
-    left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
-    library.add left_hand_darkness
-    library.add left_hand_darkness
-    library_before = Marshal.load(Marshal.dump(library))
-    patron_before = Marshal.load(Marshal.dump(pierre))
-    library.register_patron pierre
-    library.lend(book: left_hand_darkness, patron: pierre)
+    before :all do
+      @library = Library.create 'happy path lending library'
+      @pierre = Patron.create 'Pierre "Happy Path" Toulemonde'
+      @left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
+      @library.add @left_hand_darkness
+      @library.add @left_hand_darkness
+      @library_before = Marshal.load(Marshal.dump(@library))
+      @patron_before = Marshal.load(Marshal.dump(@pierre))
+      @library.register_patron @pierre
+      @library.lend(book: @left_hand_darkness, patron: @pierre)
+    end
 
     it 'the preconditions are correct' do
-      expect(library_before.books[left_hand_darkness].owned).to eq 2
-      expect(library_before.books[left_hand_darkness].in_circulation).to eq 2
-      expect(patron_before.borrowing?(left_hand_darkness)).to be_falsey
+      expect(@library_before.owns?(@left_hand_darkness)).to be_truthy
+      expect(@library_before.books[@left_hand_darkness].owned).to eq 2
+      expect(@library_before.books[@left_hand_darkness].in_circulation).to eq 2
+      expect(@patron_before.borrowing?(@left_hand_darkness)).to be_falsey
     end
 
     it 'raise a book leant event' do
-      expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: pierre, library: library)).to be_truthy
+      expect(LibraryLeantBookEvent.any?(book: @left_hand_darkness, patron: @pierre, library: @library)).to be_truthy
     end
 
     it 'raise a patron borrowed event' do
-      expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: pierre, library: library)).to be_truthy
+      expect(PatronBorrowedBookEvent.any?(book: @left_hand_darkness, patron: @pierre, library: @library)).to be_truthy
     end
 
     it 'removes a copy of the book from circulation' do
-      expect(library.books[left_hand_darkness].owned).to eq 2
-      expect(library.books[left_hand_darkness].in_circulation).to eq 1
+      expect(@library.books[@left_hand_darkness].owned).to eq 2
+      expect(@library.books[@left_hand_darkness].in_circulation).to eq 1
     end
 
     it 'becomes borrowed by the patron' do
-      expect(pierre.books[left_hand_darkness].borrowed).to eq 1
+      expect(@pierre.books[@left_hand_darkness].borrowed).to eq 1
     end
 
     it 'is reflected in the event store' do
-      the_library = Library.get(library.id)
-      expect(the_library.books[left_hand_darkness].owned).to eq 2
-      expect(the_library.books[left_hand_darkness].in_circulation).to eq 1
+      the_library = Library.get(@library.id)
+      expect(the_library.books[@left_hand_darkness].owned).to eq 2
+      expect(the_library.books[@left_hand_darkness].in_circulation).to eq 1
     end
   end
 
   context 'trying to lend a book' do
-    library = Library.create 'sad path lending library'
-    jacque = Patron.create 'Jacque "Sad Path" Toulemonde'
-    library.register_patron jacque
-    left_hand_darkness = Book.create(title: 'The Left Hand of Darkness', author: 'Ursula K. LeGuin')
-    library.add left_hand_darkness
+    before :all do
+      @library = Library.create 'sad path lending library'
+      @jacque = Patron.create 'Jacque "Sad Path" Toulemonde'
+      @library.register_patron @jacque
+      @dragonriders = Book.create(title: 'The Dragonriders of Pern', author: 'Anne McCaffrey')
+      @library.add @dragonriders
+    end
 
     it 'will not lend a book to a person who is not registered as a patron' do
       michelle = Patron.create 'Michelle "Not a Patron" Toulemonde'
-      library.lend(book: left_hand_darkness, patron: michelle)
-      expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: michelle, library: library)).to be_falsey
-      expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: michelle, library: library)).to be_falsey
+      @library.lend(book: @dragonriders, patron: michelle)
+      expect(LibraryLeantBookEvent.any?(book: @dragonriders, patron: michelle, library: @library)).to be_falsey
+      expect(PatronBorrowedBookEvent.any?(book: @dragonriders, patron: michelle, library: @library)).to be_falsey
     end
 
     it 'will not lend a book the library does not own' do
       neuromancer = Book.new(title: 'Neuromancer', author: 'William Gibson')
-      expect(library.owns?(neuromancer)).to be_falsey
+      expect(@library.owns?(neuromancer)).to be_falsey
 
-      library.lend(book: neuromancer, patron: jacque)
-      expect(LibraryLeantBookEvent.any?(book: neuromancer, patron: jacque, library: library)).to be_falsey
-      expect(PatronBorrowedBookEvent.any?(book: neuromancer, patron: jacque, library: library)).to be_falsey
+      @library.lend(book: neuromancer, patron: @jacque)
+      expect(LibraryLeantBookEvent.any?(book: neuromancer, patron: @jacque, library: @library)).to be_falsey
+      expect(PatronBorrowedBookEvent.any?(book: neuromancer, patron: @jacque, library: @library)).to be_falsey
     end
 
     it 'will not lend a book with no copies in circulation' do
-      copies_in_circulation = library.books[left_hand_darkness].in_circulation
+      copies_in_circulation = @library.books[@dragonriders].in_circulation
       expect(copies_in_circulation.positive?).to be_truthy
-      library.books.update(left_hand_darkness) { |b| b.subtract_in_circulation(copies_in_circulation) }
-      expect(library.in_circulation?(left_hand_darkness)).to be_falsey
+      @library.books.update(@dragonriders) { |b| b.subtract_in_circulation(copies_in_circulation) }
+      expect(@library.in_circulation?(@dragonriders)).to be_falsey
 
-      library.lend(book: left_hand_darkness, patron: jacque)
-      expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: jacque, library: library)).to be_falsey
-      expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: jacque, library: library)).to be_falsey
+      @library.lend(book: @dragonriders, patron: @jacque)
+      expect(LibraryLeantBookEvent.any?(book: @dragonriders, patron: @jacque, library: @library)).to be_falsey
+      expect(PatronBorrowedBookEvent.any?(book: @dragonriders, patron: @jacque, library: @library)).to be_falsey
 
-      library.books.update(left_hand_darkness) { |b| b.add_in_circulation(copies_in_circulation) }
-      expect(library.books[left_hand_darkness].in_circulation).to eq copies_in_circulation
+      @library.books.update(@dragonriders) { |b| b.add_in_circulation(copies_in_circulation) }
+      expect(@library.books[@dragonriders].in_circulation).to eq copies_in_circulation
     end
 
     it 'will not lend a book to a patron in bad standing' do
       alice = Patron.create 'Alice "Not a Patron" Toulemonde'
-      library.register_patron alice
-      library.revoke_borrowing alice
+      @library.register_patron alice
+      @library.revoke_borrowing alice
 
-      library.lend(book: left_hand_darkness, patron: alice)
-      expect(LibraryLeantBookEvent.any?(book: left_hand_darkness, patron: alice, library: library)).to be_falsey
-      expect(PatronBorrowedBookEvent.any?(book: left_hand_darkness, patron: alice, library: library)).to be_falsey
+      @library.lend(book: @dragonriders, patron: alice)
+      expect(LibraryLeantBookEvent.any?(book: @dragonriders, patron: alice, library: @library)).to be_falsey
+      expect(PatronBorrowedBookEvent.any?(book: @dragonriders, patron: alice, library: @library)).to be_falsey
     end
   end
 end

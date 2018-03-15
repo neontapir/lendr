@@ -14,7 +14,11 @@ class PatronBorrowedBookEvent < Event
   end
 
   def self.raise(book:, library:, patron:)
-    EventStore.instance << PatronBorrowedBookEvent.new(book: book, library: library, patron: patron)
+    event = new(book: book, library: library, patron: patron)
+    [book, library, library.books, library.patrons, patron, patron.books].each do |entity|
+      entity.update_timestamp event.timestamp
+    end
+    EventStore.store event
   end
 
   def self.any?(book:, library:, patron:)

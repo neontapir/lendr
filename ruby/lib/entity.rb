@@ -8,11 +8,16 @@ class Entity
 
   def initialize
     @id = SecureRandom.uuid
-    @timestamp = Time.now
+    update_timestamp
+  end
+
+  def update_timestamp(new_time = Time.now)
+    @timestamp = new_time
   end
 
   def ==(other)
-    self.class == other.class && id == other.id
+    self.class == other.class &&
+      id == other.id
   end
 
   alias_method :eql?, :==
@@ -21,33 +26,46 @@ class Entity
     id.hash
   end
 
-  def self.find_by_attributes(&entity_lookup)
+  def self.find_by_attributes(time = Time.now, &entity_lookup)
     events = EventStore.instance.find_all do |event|
       begin
-        entity_lookup.call(event)
+        time >= event.timestamp &&
+          entity_lookup.call(event)
       rescue NoMethodError
         false
       end
     end.sort_by(&:timestamp)
     return nil if events.empty?
 
+    project(events)
+  end
+
+  def self.find_by_id(id, time = Time.now, &event_id_lookup)
+    events = EventStore.instance.find_all do |e|
+      begin
+        time >= e.timestamp &&
+          id == event_id_lookup.call(e)
+      rescue NoMethodError
+        false
+      end
+    end.sort_by(&:timestamp)
+    return nil if events.empty?
+
+    project(events)
+  end
+
+  def self.project(events)
     projection = new
-    events.each { |e| e.apply_to(projection) }
+    events.each do |e|
+      e.apply_to(projection)
+    end
     projection
   end
 
-  def self.find_by_id(id, &event_id_lookup)
-    events = EventStore.instance.find_all do |e|
-      begin
-        id == event_id_lookup.call(e)
-      rescue NoMethodError
-        false
-      end
-    end.sort_by(&:timestamp)
-    return nil if events.empty?
-
-    projection = new
-    events.each { |e| e.apply_to(projection) }
-    projection
+  def to_s
+    variables = instance_variables.map do |v|
+      "#{v}: #{instance_variable_get(v.to_s)}"
+    end.join(', ')
+    "{ #{self.class}: #{variables} }"
   end
 end

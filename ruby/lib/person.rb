@@ -6,10 +6,6 @@ require_relative 'events/author_created_event.rb'
 class Person < Entity
   attr_reader :name
 
-  def to_s
-    "Person { id: '#{id}' }"
-  end
-
   private
 
   def initialize(name = nil)

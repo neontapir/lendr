@@ -30,9 +30,9 @@ class Patrons < Entity
 
   private
 
-  def initialize(default_value)
+  def initialize(default_value, list = {})
     super()
     @default_value = default_value
-    @list = {}
+    @list = list
   end
 end

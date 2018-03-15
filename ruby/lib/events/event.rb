@@ -15,4 +15,11 @@ class Event < Entity
       projection.instance_variable_set key, value
     end
   end
+
+  def to_s
+    variables = instance_variables.map do |v|
+      "#{v}: #{instance_variable_get(v.to_s)}"
+    end.join(', ')
+    "{ #{self.class}: #{variables} }"
+  end
 end

@@ -12,7 +12,9 @@ class BookCreatedEvent < Event
   end
 
   def self.raise(book)
-    EventStore.instance << BookCreatedEvent.new(book)
+    event = new(book)
+    book.update_timestamp event.timestamp
+    EventStore.store event
   end
 
   def self.any?(book)
