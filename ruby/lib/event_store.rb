@@ -13,8 +13,9 @@ class EventStore
   end
 
   def self.store(event)
-    raise unless event.is_a?(Event)
+    raise ArgumentError unless event.is_a?(Event)
     instance << Marshal.load( Marshal.dump(event) )
+    true # no need to return whole event store
   end
 
   def_delegators :@list, :empty?, :<<, :size, :map, :any?,

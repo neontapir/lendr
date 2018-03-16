@@ -24,13 +24,15 @@ class Library < Entity
   end
 
   def add(book)
-    raise ArgumentError, "#{book} is not a book" unless book.is_a? Book
+    raise ArgumentError unless book.is_a? Book
     @books.add(book) unless owns?(book)
     @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
     BookCopyAddedEvent.dispatch(library: self, book: book)
   end
 
   def lend(book:, patron:)
+    raise ArgumentError unless book.is_a? Book
+    raise ArgumentError unless patron.is_a? Patron
     return unless owns?(book) &&
                   in_circulation?(book) &&
                   patron?(patron) &&
@@ -41,11 +43,14 @@ class Library < Entity
   end
 
   def return(book:, patron:)
+    raise ArgumentError unless book.is_a? Book
+    raise ArgumentError unless patron.is_a? Patron
     @books.update(book) { |b| b.add_in_circulation(1) }
     LibraryBookReturnAcceptedEvent.dispatch(library: self, book: book, patron: patron)
   end
 
   def remove(book)
+    raise ArgumentError unless book.is_a? Book
     return unless owns?(book)
     @books.update(book) { |b| b.subtract_owned(1).subtract_in_circulation(1) }
     @books.delete book unless owns?(book)
@@ -53,41 +58,47 @@ class Library < Entity
   end
 
   def register_patron(patron)
-    raise ArgumentError, "#{patron} is not a patron" unless patron.is_a? Patron
+    raise ArgumentError unless patron.is_a? Patron
     @patrons.add(patron)
     PatronRegisteredEvent.dispatch(library: self, patron: patron)
     allow_borrowing(patron)
   end
 
   def allow_borrowing(patron)
+    raise ArgumentError unless patron.is_a? Patron
     @patrons.update(patron) { |_| PatronDisposition.good }
     PatronStandingChangedEvent.dispatch(library: self, patron: patron)
   end
 
   def revoke_borrowing(patron)
+    raise ArgumentError unless patron.is_a? Patron
     @patrons.update(patron) { |_| PatronDisposition.poor }
     PatronStandingChangedEvent.dispatch(library: self, patron: patron)
   end
 
   def owns?(book)
+    raise ArgumentError unless book.is_a? Book
     @books.key?(book) && @books[book].owned.positive?
   end
 
   def in_circulation?(book)
+    raise ArgumentError unless book.is_a? Book
     owns?(book) && @books[book].in_circulation.positive?
   end
 
   def patron?(patron)
+    raise ArgumentError unless patron.is_a? Patron
     @patrons.key?(patron)
   end
 
   def may_borrow?(patron)
+    raise ArgumentError unless patron.is_a? Patron
     @patrons[patron] == PatronDisposition.good
   end
 
   private
 
-  def initialize(name: nil, books: Books.create_library, patrons: Patrons.create)
+  def initialize(name: nil, books: Books.create_for_library, patrons: Patrons.create)
     super()
     @name = name
     @books = books

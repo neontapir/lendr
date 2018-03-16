@@ -11,7 +11,7 @@ require_relative '../lib/domain/patron.rb'
 RSpec.describe 'the event store' do
   context 'dispatching an event' do
     it 'will error if tries to store a non-event' do
-      expect { EventStore.store 'invalid' }.to raise_error RuntimeError
+      expect { EventStore.store 'invalid' }.to raise_error ArgumentError
     end
   end
 

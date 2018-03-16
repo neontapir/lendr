@@ -8,11 +8,11 @@ require_relative '../dispositions/patron_book_disposition.rb'
 class Books < Entity
   extend Forwardable
 
-  def self.create_library
+  def self.create_for_library
     Books.new LibraryBookDisposition.none
   end
 
-  def self.create_patron
+  def self.create_for_patron
     Books.new PatronBookDisposition.none
   end
 
@@ -25,7 +25,7 @@ class Books < Entity
   end
 
   def add(book)
-    @list[book] = @default_value
+    @list[book] = @initial_disposition
     self
   end
 
@@ -39,9 +39,9 @@ class Books < Entity
 
   private
 
-  def initialize(default_value, list = {})
+  def initialize(initial_disposition, list = {})
     super()
-    @default_value = default_value
+    @initial_disposition = initial_disposition
     @list = list
   end
 end

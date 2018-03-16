@@ -8,7 +8,7 @@ class Patrons < Entity
   extend Forwardable
 
   def self.create
-    Patrons.new PatronDisposition.none
+    Patrons.new
   end
 
   def [](patron)
@@ -16,7 +16,7 @@ class Patrons < Entity
   end
 
   def add(patron)
-    @list[patron] = @default_value
+    @list[patron] = PatronDisposition.none
     self
   end
 
@@ -30,9 +30,8 @@ class Patrons < Entity
 
   private
 
-  def initialize(default_value, list = {})
+  def initialize(list = {})
     super()
-    @default_value = default_value
     @list = list
   end
 end

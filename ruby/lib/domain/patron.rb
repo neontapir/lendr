@@ -19,12 +19,17 @@ class Patron < Person
   end
 
   def borrow(book:, library:)
+    raise ArgumentError unless book.is_a? Book
+    raise ArgumentError unless library.is_a? Library
+    return unless patron_of?(library)
     @books.add book unless borrowing?(book)
     @books.update(book) { |b| b.add_borrowed(1) }
     PatronBorrowedBookEvent.dispatch(library: library, book: book, patron: self)
   end
 
   def return(book:, library:)
+    raise ArgumentError unless book.is_a? Book
+    raise ArgumentError unless library.is_a? Library
     return unless patron_of?(library)
     @books.update(book) { |b| b.subtract_borrowed(1) }
     @books.delete book unless @books[book].borrowed.positive?
@@ -44,6 +49,6 @@ class Patron < Person
 
   def initialize(name = nil)
     super(name)
-    @books = Books.create_patron
+    @books = Books.create_for_patron
   end
 end

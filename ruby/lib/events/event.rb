@@ -12,7 +12,7 @@ class Event < Entity
     entities.each_value do |entity|
       entity.update_timestamp event.timestamp
     end
-    EventStore.store event
+    raise unless EventStore.store event
   end
 
   def self.any?(**entities)
