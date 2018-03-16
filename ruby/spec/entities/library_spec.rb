@@ -39,7 +39,7 @@ RSpec.describe 'the library' do
   end
 
   context 'adding a book to the library collection' do
-    it 'should raise a book copy added event' do
+    it 'should dispatch a book copy added event' do
       book = Book.create(title: 'The Little Prince',
                          author: 'Antoine de Saint-Exupéry')
       subject.add book
@@ -93,6 +93,12 @@ RSpec.describe 'the library' do
       expect(library.books[little_prince]).to eq LibraryBookDisposition.new(owned: 1, in_circulation: 1)
       expect(library.books[dune]).to eq LibraryBookDisposition.new(owned: 2, in_circulation: 2)
     end
+
+    it 'should raise an error when requested to add a non-book' do
+      patron = Patron.new name: 'John Smith'
+      expect{ subject.add patron }.to raise_error ArgumentError
+      expect(BookCopyAddedEvent.any?(book: patron, library: subject)).to be_falsey
+    end
   end
 
   context 'removing a book from the library collection' do
@@ -141,13 +147,7 @@ RSpec.describe 'the library' do
 
       subject.remove nineteen_eighty_four
       expect(subject.books).to be_empty
-
-      book_removed = EventStore.instance.any? do |e|
-        e.is_a?(BookCopyRemovedEvent) &&
-          e.book.id == nineteen_eighty_four.id &&
-          e.library.id == subject.id
-      end
-      expect(book_removed).to be_falsey
+      expect(BookCopyRemovedEvent.any?(book: nineteen_eighty_four, library: subject)).to be_falsey
     end
   end
 
@@ -156,12 +156,7 @@ RSpec.describe 'the library' do
       patron = Patron.create 'John Doe'
       subject.register_patron patron
 
-      patron_registered = EventStore.instance.any? do |e|
-        e.is_a?(PatronRegisteredEvent) &&
-          e.patron.id == patron.id &&
-          e.library.id == subject.id
-      end
-      expect(patron_registered).to be_truthy
+      expect(PatronRegisteredEvent.any?(patron: patron, library: subject)).to be_truthy
     end
 
     it 'puts the person in good standing' do
@@ -179,6 +174,12 @@ RSpec.describe 'the library' do
 
       expect(library1.patrons[patron].standing).to eq :good
       expect(library2.patron?(patron)).to be_falsey
+    end
+
+    it 'should raise an error when requested to register a non-patron' do
+      book = Book.new(title: 'Pride & Prejudice', author: 'Jane Austen')
+      expect{ subject.register_patron book }.to raise_error ArgumentError
+      expect(PatronRegisteredEvent.any?(patron: book, library: subject)).to be_falsey
     end
   end
 
@@ -273,6 +274,40 @@ RSpec.describe 'the library' do
       @library.lend(book: @dragonriders, patron: alice)
       expect(LibraryLeantBookEvent.any?(book: @dragonriders, patron: alice, library: @library)).to be_falsey
       expect(PatronBorrowedBookEvent.any?(book: @dragonriders, patron: alice, library: @library)).to be_falsey
+    end
+  end
+
+  context "changing a patron's standing" do
+    before :all do
+      @library = Library.new name: "天津滨海图书馆 'The Eye'"
+    end
+
+    it 'that a new patron is in good standing' do
+      hua = Patron.new name: 'Li Hua'
+      @library.register_patron hua
+      expect(@library.patrons[hua].standing).to eq :good
+    end
+
+    it 'can change a patron from good to poor standing' do
+      siu = Patron.new name: 'Wong Siu Ming'
+      @library.register_patron siu
+      @library.revoke_borrowing siu
+      expect(@library.patrons[siu].standing).to eq :poor
+    end
+
+    it 'can change a patron in poor standing back to good' do
+      tai = Patron.new name: 'Chan Tai Man'
+      @library.register_patron tai
+      @library.revoke_borrowing tai
+      expect(@library.patrons[tai].standing).to eq :poor
+    end
+
+    it 'can change a patron in poor standing back to good' do
+      san = Patron.new name: 'Zhang San'
+      @library.register_patron san
+      @library.revoke_borrowing san
+      @library.allow_borrowing san
+      expect(@library.patrons[san].standing).to eq :good
     end
   end
 end

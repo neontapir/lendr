@@ -24,6 +24,7 @@ class Library < Entity
   end
 
   def add(book)
+    raise ArgumentError, "#{book} is not a book" unless book.is_a? Book
     @books.add(book) unless owns?(book)
     @books.update(book) { |b| b.add_owned(1).add_in_circulation(1) }
     BookCopyAddedEvent.dispatch(library: self, book: book)
@@ -52,6 +53,7 @@ class Library < Entity
   end
 
   def register_patron(patron)
+    raise ArgumentError, "#{patron} is not a patron" unless patron.is_a? Patron
     @patrons.add(patron)
     PatronRegisteredEvent.dispatch(library: self, patron: patron)
     allow_borrowing(patron)
