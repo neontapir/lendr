@@ -162,7 +162,6 @@ RSpec.describe 'the library' do
     it 'puts the person in good standing' do
       patron = Patron.create 'Jane Doe'
       subject.register_patron patron
-
       expect(subject.patrons[patron].standing).to eq :good
     end
 
@@ -280,12 +279,6 @@ RSpec.describe 'the library' do
   context "changing a patron's standing" do
     before :all do
       @library = Library.new name: "天津滨海图书馆 'The Eye'"
-    end
-
-    it 'that a new patron is in good standing' do
-      hua = Patron.new name: 'Li Hua'
-      @library.register_patron hua
-      expect(@library.patrons[hua].standing).to eq :good
     end
 
     it 'can change a patron from good to poor standing' do
