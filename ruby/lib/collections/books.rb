@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require_relative 'entity.rb'
-require_relative 'library_book_disposition.rb'
-require_relative 'patron_book_disposition.rb'
+require_relative '../domain/entity.rb'
+require_relative '../dispositions/library_book_disposition.rb'
+require_relative '../dispositions/patron_book_disposition.rb'
 
 class Books < Entity
   extend Forwardable

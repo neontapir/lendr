@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'entity.rb'
-require_relative 'events/author_created_event.rb'
+require_relative '../events/author_created_event.rb'
 
 class Person < Entity
   attr_reader :name

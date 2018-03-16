@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 require 'uuid'
-require_relative '../lib/book.rb'
-require_relative '../lib/library.rb'
-require_relative '../lib/patron.rb'
+require_relative '../../lib/domain/book.rb'
+require_relative '../../lib/domain/library.rb'
+require_relative '../../lib/domain/patron.rb'
 
 RSpec.describe 'the patron' do
   name = 'John Doe'

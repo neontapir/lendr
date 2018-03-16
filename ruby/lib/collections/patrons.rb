@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require_relative 'patron_disposition.rb'
-require_relative 'entity.rb'
+require_relative '../dispositions/patron_disposition.rb'
+require_relative '../domain/entity.rb'
 
 class Patrons < Entity
   extend Forwardable

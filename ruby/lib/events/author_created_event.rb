@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'event.rb'
-require_relative 'event_store.rb'
+require_relative '../events/event.rb'
+require_relative '../event_store.rb'
 
 class AuthorCreatedEvent < Event
   attr_reader :author

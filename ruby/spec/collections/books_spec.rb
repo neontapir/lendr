@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require_relative '../lib/books.rb'
+require_relative '../../lib/collections/books.rb'
 
 RSpec.describe 'the books collection' do
   it 'the update method updates the disposition in the books collection' do

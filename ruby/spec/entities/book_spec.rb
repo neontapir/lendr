@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 require 'uuid'
-require_relative '../lib/book.rb'
+require_relative '../../lib/domain/book.rb'
 
 RSpec.describe 'the book' do
   title = 'The Little Prince'

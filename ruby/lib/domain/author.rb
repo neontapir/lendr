@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'person.rb'
-require_relative 'events/author_created_event.rb'
+require_relative '../events/author_created_event.rb'
 
 class Author < Person
   def self.create(name)

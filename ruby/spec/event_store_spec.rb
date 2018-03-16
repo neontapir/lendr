@@ -2,11 +2,11 @@
 # encoding: utf-8
 
 require 'Timecop'
-require_relative '../lib/author.rb'
-require_relative '../lib/book.rb'
-require_relative '../lib/library.rb'
-require_relative '../lib/library_book_disposition.rb'
-require_relative '../lib/patron.rb'
+require_relative '../lib/domain/author.rb'
+require_relative '../lib/domain/book.rb'
+require_relative '../lib/domain/library.rb'
+require_relative '../lib/dispositions/library_book_disposition.rb'
+require_relative '../lib/domain/patron.rb'
 
 RSpec.describe 'the event store' do
   context 'dispatching an event' do

@@ -2,12 +2,12 @@
 
 require 'forwardable'
 require 'singleton'
-require_relative 'event.rb'
+require_relative 'events/event.rb'
 
 class EventStore
   include Singleton
   extend Forwardable
-  
+
   def initialize(list = [])
     @list = list
   end

@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative 'books.rb'
+require_relative '../collections/books.rb'
 require_relative 'entity.rb'
-require_relative 'patrons.rb'
-require_relative 'events/book_copy_added_event.rb'
-require_relative 'events/book_copy_removed_event.rb'
-require_relative 'events/library_leant_book_event.rb'
-require_relative 'events/library_created_event.rb'
-require_relative 'events/library_book_return_accepted_event.rb'
-require_relative 'events/patron_registered_event.rb'
-require_relative 'events/patron_standing_changed_event.rb'
+require_relative '../collections/patrons.rb'
+require_relative '../events/book_copy_added_event.rb'
+require_relative '../events/book_copy_removed_event.rb'
+require_relative '../events/library_leant_book_event.rb'
+require_relative '../events/library_created_event.rb'
+require_relative '../events/library_book_return_accepted_event.rb'
+require_relative '../events/patron_registered_event.rb'
+require_relative '../events/patron_standing_changed_event.rb'
 
 class Library < Entity
   attr_reader :books, :patrons, :name

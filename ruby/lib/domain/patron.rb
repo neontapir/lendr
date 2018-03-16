@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'books.rb'
+require_relative '../collections/books.rb'
 require_relative 'person.rb'
-require_relative 'events/patron_created_event.rb'
-require_relative 'events/patron_borrowed_book_event.rb'
-require_relative 'events/patron_returned_book_event.rb'
+require_relative '../events/patron_created_event.rb'
+require_relative '../events/patron_borrowed_book_event.rb'
+require_relative '../events/patron_returned_book_event.rb'
 
 class Patron < Person
   attr_reader :books

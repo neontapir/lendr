@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require_relative '../lib/library_book_disposition.rb'
+require_relative '../../lib/dispositions/library_book_disposition.rb'
 
 RSpec.describe 'the library book disposition' do
   context 'adding books' do

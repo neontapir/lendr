@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'event.rb'
-require_relative 'event_store.rb'
+require_relative '../event_store.rb'
 
 class LibraryCreatedEvent < Event
   attr_reader :library

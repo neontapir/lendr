@@ -2,7 +2,7 @@
 
 require_relative 'author.rb'
 require_relative 'entity.rb'
-require_relative 'events/book_created_event.rb'
+require_relative '../events/book_created_event.rb'
 
 class Book < Entity
   attr_reader :title, :author

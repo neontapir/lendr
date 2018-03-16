@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 require 'uuid'
-require_relative '../lib/author.rb'
+require_relative '../../lib/domain/author.rb'
 
 RSpec.describe 'the author' do
   name = 'Frank Herbert'

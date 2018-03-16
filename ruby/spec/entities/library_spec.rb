@@ -3,9 +3,9 @@
 
 require 'timecop'
 require 'uuid'
-require_relative '../lib/book.rb'
-require_relative '../lib/library.rb'
-require_relative '../lib/patron.rb'
+require_relative '../../lib/domain/book.rb'
+require_relative '../../lib/domain/library.rb'
+require_relative '../../lib/domain/patron.rb'
 
 RSpec.describe 'the library' do
   let(:subject) { Library.create 'the library spec' }

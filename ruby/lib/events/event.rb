@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../entity.rb'
+require_relative '../domain/entity.rb'
 
 class Event < Entity
   def self.dispatch(**entities)
