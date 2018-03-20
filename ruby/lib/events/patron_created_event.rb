@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
 require_relative 'event.rb'
-require_relative '../event_store.rb'
 
 class PatronCreatedEvent < Event
-  attr_reader :patron
-
   def initialize(patron:)
-    super()
-    @patron = patron
+    super
   end
 
   def apply_to(projection)

@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
 require_relative 'event.rb'
-require_relative '../event_store.rb'
 
 class LibraryBookReturnAcceptedEvent < Event
-  attr_reader :book, :library, :patron
-
   def initialize(book:, library:, patron:)
-    super()
-    @book = book
-    @library = library
-    @patron = patron
+    super
   end
 
   def apply_to(projection)
