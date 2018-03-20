@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../events/event.rb'
+require_relative 'event.rb'
 
 class AuthorCreatedEvent < Event
   def initialize(author:)
