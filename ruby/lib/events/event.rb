@@ -9,11 +9,7 @@ class Event < Entity
   def initialize(**entities)
     super()
     @entities = entities
-    entities.each_key do |entity|
-      self.class.define_method(entity) do
-        @entities[entity]
-      end
-    end
+    define_entity_readers entities
   end
 
   def self.any?(**entities)
@@ -39,6 +35,16 @@ class Event < Entity
     raise NotFoundError, 'All entity changes should update the timestamp, but this one does not' unless transform.key? :@timestamp
     transform.each do |key, value|
       projection.instance_variable_set key, value
+    end
+  end
+
+  private
+
+  def define_entity_readers(entities)
+    entities.each_key do |entity|
+      self.class.define_method(entity) do
+        instance_variable_get(:@entities).send(:[], entity)
+      end
     end
   end
 end
