@@ -1,0 +1,10 @@
+require "rspec/core/rake_task"
+
+task default: %w[spec]
+
+task :spec do
+  pp "Running all specifications"
+  RSpec::Core::RakeTask.new do |t|
+    t.pattern = "spec/**/*_spec.rb"
+  end
+end
