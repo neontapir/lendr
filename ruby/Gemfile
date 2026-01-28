@@ -8,3 +8,5 @@ gem 'timecop'
 gem 'uuid'
 
 gem 'solargraph', :group => 'ide'
+
+gem "rspec", "~> 3.13"
